@@ -1,0 +1,92 @@
+openapi: 3.0.0
+info:
+  title: Doctor Buddy
+  version: 1.0.0
+  description: Simple API with Swagger YAML
+
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /:
+    get:
+      summary: Returns Hello World
+      responses:
+        '200':
+          description: Successful greeting response
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Hello World
+  
+  /api/doctor/sign-up:
+    post:
+      summary: Creates doctor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDoctorRequest'
+      responses:
+        '201':
+          description: Successfully signed up
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+  
+  /api/doctor/login:
+    post:
+      summary: Authenticates doctor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginDoctorRequest'
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: 
+                    type: string
+
+
+components:
+  schemas:
+    CreateDoctorRequest:
+      type: object
+      properties:
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - email
+        - password
+    
+    LoginDoctorRequest:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      required:
+        - email
+        - password

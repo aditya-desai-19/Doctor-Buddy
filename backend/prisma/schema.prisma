@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model Doctor {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  email String @unique
+  password String
+  isDeleted Boolean
+  patients Patient[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model Patient {
+  id String @id @default(uuid())
+  firstName String
+  lastName String
+  email String @unique
+  contactNumber String
+  isDeleted Boolean
+  doctorId String
+  doctor Doctor @relation(fields: [doctorId], references: [id])
+  treatments Treatment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model Treatment {
+  id String @id @default(uuid())
+  name String
+  description String
+  cost Int
+  isDeleted Boolean
+  patientId String
+  patient Patient @relation(fields: [patientId], references: [id])
+  payments Payment[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+
+model Payment {
+  id String @id @default(uuid())
+  amount Int
+  isDeleted Boolean
+  treatmentId String
+  treatment Treatment @relation(fields: [treatmentId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
