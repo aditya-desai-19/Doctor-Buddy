@@ -25,6 +25,8 @@ type DoctorResponse = {
   deletedAt: Date | null
 } | null
 
+type DoctorInfo = paths["/api/doctor/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
+
 const checkIfUserExist = async (email: string): Promise<DoctorResponse> => {
   try {
     const response = await prisma.doctor.findFirst({
@@ -90,7 +92,7 @@ export const authenticateDoctor = async (req: Request, res: Response) => {
 
     //generate token
     const isMatch = await bcrypt.compare(body.password, user.password)
-    if (isMatch) {
+    if (isMatch && !user.isDeleted) {
       const expiration = Math.floor(Date.now() / 1000) + 60 * 60 * 24
       const userDetails = {
         name: `${user.firstName} ${user.lastName}`,
@@ -99,11 +101,95 @@ export const authenticateDoctor = async (req: Request, res: Response) => {
       const secret = process.env.AUTH_SECRET || "doctorBuddy"
       const token = jwt.sign({ user: userDetails, exp: expiration }, secret)
       return res.status(200).json({ token })
-    } else {
-      return res.status(400).json({ message: "User not found" })
     }
+    return res.status(400).json({ message: "Doctor not found" })
   } catch (error) {
     console.error({ error })
     return res.status(500).json({ message: "Something went wrong" })
   }
 }
+
+export const getDoctorById = async  (req: Request, res: Response) => {
+  try {
+    const {id} = req.params
+    const response: DoctorResponse = await prisma.doctor.findUnique({
+      where: {
+        id
+      }
+    })
+    
+    if(response && !response.isDeleted) {
+      const result: DoctorInfo = {
+        email: response.email,
+        firstName: response.firstName,
+        lastName: response.lastName
+      }
+
+      return res.status(200).json({...result})
+    }
+
+    return res.status(404).json({message: "Doctor not found"})
+  } catch (error) {
+    console.error({ error })
+    return res.status(500).json({ message: "Something went wrong" })
+  }
+}
+
+export const updateDoctor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const { firstName, lastName, email } = req.body;
+
+    if (!firstName || !lastName || !email) {
+      return res.status(400).json({ message: 'All fields are required.' });
+    }
+
+    const existingDoctor = await prisma.doctor.findUnique({ where: { id } });
+
+    if (!existingDoctor || existingDoctor.isDeleted) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    await prisma.doctor.update({
+      where: { id },
+      data: {
+        firstName,
+        lastName,
+        email,
+      },
+    });
+
+    return res.status(200).json({ message: 'Successfully updated doctor information'});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+export const deleteDoctor = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    const existingDoctor = await prisma.doctor.findUnique({
+      where: { id }
+    });
+
+    if (!existingDoctor || existingDoctor.isDeleted) {
+      return res.status(404).json({ message: 'Doctor not found' });
+    }
+
+    await prisma.doctor.update({
+      where: { id },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date()
+      }
+    });
+
+    return res.status(200).json({ message: 'Doctor deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};

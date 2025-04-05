@@ -60,6 +60,49 @@ paths:
                   token: 
                     type: string
 
+  /api/doctor/{id}:
+    get:
+      summary: Retrieves doctor's information
+      responses:
+        '200':
+          description: Successfully gets doctor's information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorInfoResponse'
+
+    put:
+      summary: Updates doctor's information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDoctorInfoRequest'
+      responses:
+        '200':
+          description: Successfully updates doctor's information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+
+    delete:
+      summary: Soft deletes doctor
+      responses:
+        '200':
+          description: Successfully deleted doctor
+          content:
+            application/json:
+              schema:  
+                type: object
+                properties:
+                  message: 
+                    type: string
+
 
 components:
   schemas:
@@ -90,3 +133,27 @@ components:
       required:
         - email
         - password
+
+    DoctorInfoResponse: 
+      type: object
+      properties:
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        email:
+          type: string
+    
+    UpdateDoctorInfoRequest:
+      type: object
+      properties:
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        email:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - email
