@@ -103,6 +103,68 @@ paths:
                   message: 
                     type: string
 
+  /api/patient/:
+    post:
+      summary: Creates a patient 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePatientRequest'
+      responses:
+        '200':
+          description: Successfully created a patient
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: string
+    
+  /api/patient/{id}:
+    get:
+      summary: Retrieves patient's information
+      responses:
+        '200':
+          description: Successfully gets patient's information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientInfoResponse'
+
+    put:
+      summary: Updates patient's information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePatientRequest'
+      responses:
+        '200':
+          description: Successfully updates patient's information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+
+    delete:
+      summary: Soft deletes doctor
+      responses:
+        '200':
+          description: Successfully deleted doctor
+          content:
+            application/json:
+              schema:  
+                type: object
+                properties:
+                  message: 
+                    type: string
 
 components:
   schemas:
@@ -157,3 +219,50 @@ components:
         - firstName
         - lastName
         - email
+    
+    CreatePatientRequest:   
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        contactNumber:
+          type: string
+        email:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - contactNumber
+    
+    PatientInfoResponse: 
+      type: object
+      properties:
+        firstName: 
+          type: string
+        lastName: 
+          type: string
+        email:
+          type: string
+        contactNumber:
+          type: string
+
+    UpdatePatientRequest:   
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        contactNumber:
+          type: string
+        doctorId:
+          type: string
+        email:
+          type: string
+      required:
+        - firstName
+        - lastName
+        - contactNumber 
+        - doctorId

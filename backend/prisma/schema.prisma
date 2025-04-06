@@ -25,7 +25,6 @@ model Patient {
   id String @id @default(uuid())
   firstName String
   lastName String
-  email String @unique
   contactNumber String
   isDeleted Boolean
   doctorId String
@@ -33,13 +32,13 @@ model Patient {
   treatments Treatment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  email String? @unique
   deletedAt DateTime?
 }
 
 model Treatment {
   id String @id @default(uuid())
   name String
-  description String
   cost Int
   isDeleted Boolean
   patientId String
@@ -47,6 +46,7 @@ model Treatment {
   payments Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  description String?
   deletedAt DateTime?
 }
 

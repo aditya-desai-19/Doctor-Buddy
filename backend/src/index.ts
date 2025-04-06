@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import swaggerUi from "swagger-ui-express"
 import YAML from "yamljs"
 import doctorRouter from "./routes/doctor.route"
+import patientRouter from "./routes/patient.route"
 
 dotenv.config()
 
@@ -20,6 +21,7 @@ app.get("/", (_req, res) => {
 })
 
 app.use("/api/doctor", doctorRouter)
+app.use("/api/patient", patientRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)
