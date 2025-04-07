@@ -123,6 +123,29 @@ paths:
                   id: 
                     type: string
     
+    get:
+      summary: Retrieve a list of patients
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: A list of patients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientResponse'
+
   /api/patient/{id}:
     get:
       summary: Retrieves patient's information
@@ -165,6 +188,7 @@ paths:
                 properties:
                   message: 
                     type: string
+
 
 components:
   schemas:
@@ -266,3 +290,64 @@ components:
         - lastName
         - contactNumber 
         - doctorId
+
+    PatientInfo: 
+      type: object
+      required:
+        - id
+        - firstName
+        - lastName
+        - contactNumber
+        - isDeleted
+        - doctorId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        contactNumber:
+          type: string
+        isDeleted:
+          type: boolean
+        doctorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        email:
+          type: string
+          format: email
+          nullable: true
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+
+    PaginationInfo:
+      type: object
+      properties:
+        page:
+          type: integer
+        limit:
+          type: integer
+
+    PaginatedPatientResponse:
+      type: object
+      properties:
+        previous:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        next:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PatientInfo'
