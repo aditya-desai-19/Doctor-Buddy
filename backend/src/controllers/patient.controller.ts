@@ -17,10 +17,14 @@ type PaginatedPatientResponse =
 type PatientInfo =
   paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]["data"]
 
-const getPatient = async (id: string) => {
+const getPatient = async (id: string, doctorId: string) => {
   try {
     return await prisma.patient.findUnique({
-      where: { id },
+      relationLoadStrategy: "join",
+      where: { id, doctorId, isDeleted: false },
+      include: {
+        doctor: true
+      }
     })
   } catch (error) {
     console.error({ error })
@@ -38,6 +42,7 @@ export const createPatient = async (req: CustomRequest, res: Response) => {
     }
 
     const newPatient = await prisma.patient.create({
+      relationLoadStrategy: "join",
       data: {
         firstName,
         lastName,
@@ -46,6 +51,9 @@ export const createPatient = async (req: CustomRequest, res: Response) => {
         email,
         isDeleted: false,
       },
+      include: {
+        doctor: true
+      }
     })
 
     return res.status(200).json({ id: newPatient.id })
@@ -59,14 +67,10 @@ export const getPatientById = async (req: CustomRequest, res: Response) => {
   try {
     const { id } = req.params
 
-    const patient = await getPatient(id)
+    const patient = await getPatient(id, req.user.doctorId)
 
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" })
-    }
-
-    if (req.user.doctorId != patient.doctorId) {
-      return res.status(403).json({ message: "Unauthorized request" })
     }
 
     const { firstName, lastName, email, contactNumber } = patient
@@ -93,12 +97,9 @@ export const updatePatientById = async (req: CustomRequest, res: Response) => {
       return res.status(400).json({ error: "Missing required fields" })
     }
 
-    if (req.user.doctorId != doctorId) {
-      return res.status(403).json({ message: "Unauthorized request" })
-    }
-
     await prisma.patient.update({
-      where: { id },
+      relationLoadStrategy: "join",
+      where: { id, doctorId: req.user.doctorId,isDeleted: false },
       data: {
         firstName,
         lastName,
@@ -106,6 +107,9 @@ export const updatePatientById = async (req: CustomRequest, res: Response) => {
         doctorId,
         email,
       },
+      include: {
+        doctor: true
+      }
     })
 
     return res
@@ -121,22 +125,22 @@ export const deletePatientById = async (req: CustomRequest, res: Response) => {
   try {
     const { id } = req.params
 
-    const patient = await getPatient(id)
+    const patient = await getPatient(id, req.user.doctorId)
 
     if (!patient) {
       return res.status(404).json({ error: "Patient not found" })
     }
 
-    if (req.user.doctorId != patient.doctorId) {
-      return res.status(403).json({ message: "Unauthorized request" })
-    }
-
     await prisma.patient.update({
-      where: { id },
+      relationLoadStrategy: "join",
+      where: { id, doctorId: req.user.doctorId },
       data: {
         isDeleted: true,
         deletedAt: new Date(),
       },
+      include: {
+        doctor: true
+      }
     })
 
     return res.status(200).json({ message: "Successfully deleted patient" })
@@ -157,23 +161,20 @@ export const getPaginatedPatients = async (
       limit: parseInt(limit as string),
     }
 
-    const doctor = await prisma.doctor.findUnique({
-      where: { id: req.user.doctorId },
-    })
-
-    if (!doctor || doctor.isDeleted) {
-      throw new Error("Doctor not found or deleted")
-    }
-
     const totalCount = await prisma.patient.count()
     const result: PaginatedPatientResponse = {}
 
     const data = await prisma.patient.findMany({
+      relationLoadStrategy: "join",
       where: {
         doctorId: req.user.doctorId,
+        isDeleted: false
       },
       skip: (query.page - 1) * query.limit,
       take: query.limit,
+      include: {
+        doctor: true
+      }
     })
 
     if (query.page > 1) {
