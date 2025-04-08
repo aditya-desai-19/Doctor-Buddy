@@ -155,7 +155,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientInfoResponse'
+                $ref: '#/components/schemas/PatientInfo'
 
     put:
       summary: Updates patient's information
@@ -177,10 +177,10 @@ paths:
                     type: string
 
     delete:
-      summary: Soft deletes doctor
+      summary: Soft deletes patient
       responses:
         '200':
-          description: Successfully deleted doctor
+          description: Successfully deleted patient
           content:
             application/json:
               schema:  
@@ -189,6 +189,97 @@ paths:
                   message: 
                     type: string
 
+  /api/treatment/:
+    post:
+      summary: Creates a treatment 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Treatment'
+      responses:
+        '200':
+          description: Successfully created a treatment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: string
+    
+    get:
+      summary: Retrieve a list of treatments
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: true
+          schema:
+            type: integer
+        - name: patientId
+          in: query
+          description: Patient id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of treatments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTreatmentResponse'
+  
+  /api/treatment/{id}:
+    get:
+      summary: Retrieves treatment information
+      responses:
+        '200':
+          description: Successfully gets treatment information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TreatmentInfo'
+
+    put:
+      summary: Updates patient's information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTreatmentRequest'
+      responses:
+        '200':
+          description: Successfully updates treatment information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+
+    delete:
+      summary: Soft deletes treatment
+      responses:
+        '200':
+          description: Successfully deleted treatment
+          content:
+            application/json:
+              schema:  
+                type: object
+                properties:
+                  message: 
+                    type: string
 
 components:
   schemas:
@@ -253,24 +344,15 @@ components:
           type: string
         contactNumber:
           type: string
+        doctorId:
+          type: string
         email:
           type: string
       required:
         - firstName
         - lastName
         - contactNumber
-    
-    PatientInfoResponse: 
-      type: object
-      properties:
-        firstName: 
-          type: string
-        lastName: 
-          type: string
-        email:
-          type: string
-        contactNumber:
-          type: string
+        - doctorId
 
     UpdatePatientRequest:   
       type: object
@@ -281,15 +363,12 @@ components:
           type: string
         contactNumber:
           type: string
-        doctorId:
-          type: string
         email:
           type: string
       required:
         - firstName
         - lastName
-        - contactNumber 
-        - doctorId
+        - contactNumber
 
     PatientInfo: 
       type: object
@@ -351,3 +430,81 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PatientInfo'
+    
+    Treatment:
+      type: object
+      properties:
+        name: 
+          type: string
+        patientId: 
+          type: string
+        description: 
+          type: string
+        cost: 
+          type: integer
+      required:
+        - name
+        - patientId
+        - cost
+    
+    TreatmentInfo: 
+      type: object
+      required:
+        - id
+        - name
+        - cost
+        - isDeleted
+        - patientId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        cost:
+          type: integer
+        isDeleted:
+          type: boolean
+        doctorId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        description:
+          type: string
+          nullable: true
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+    
+    PaginatedTreatmentResponse:
+      type: object
+      properties:
+        previous:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        next:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/TreatmentInfo'
+    
+    UpdateTreatmentRequest:
+      type: object
+      properties:
+        name: 
+          type: string
+        description: 
+          type: string
+        cost: 
+          type: integer
+      required:
+        - name
+        - cost

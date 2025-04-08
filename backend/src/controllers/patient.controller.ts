@@ -14,20 +14,38 @@ type GetPatientRequest = paths["/api/patient/"]["get"]["parameters"]["query"]
 type PaginatedPatientResponse =
   paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]
 
-type PatientInfo =
-  paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]["data"]
 
 const getPatient = async (id: string, doctorId: string) => {
   try {
     return await prisma.patient.findUnique({
       relationLoadStrategy: "join",
-      where: { id, doctorId, isDeleted: false },
+      where: {
+        id,
+        doctorId,
+        isDeleted: false,
+        doctor: {
+          isDeleted: false,
+        },
+      },
       include: {
-        doctor: true
-      }
+        doctor: true,
+      },
     })
   } catch (error) {
     console.error({ error })
+    return null
+  }
+}
+
+const checkDoctorExist = async(doctorId: string) => {
+  try {
+    await prisma.doctor.findUnique({
+      where: {
+        id: doctorId,
+        isDeleted: false
+      }
+    })
+  } catch (error) {
     return null
   }
 }
@@ -41,8 +59,14 @@ export const createPatient = async (req: CustomRequest, res: Response) => {
       return res.status(400).json({ error: "Missing required fields" })
     }
 
+    //add check if doctor exist
+    const doctor = await checkDoctorExist(req.user.doctorId)
+
+    if(!doctor) {
+      return res.status(404).json({error: "Doctor does not exist"})
+    }
+
     const newPatient = await prisma.patient.create({
-      relationLoadStrategy: "join",
       data: {
         firstName,
         lastName,
@@ -50,13 +74,10 @@ export const createPatient = async (req: CustomRequest, res: Response) => {
         doctorId: req.user.doctorId,
         email,
         isDeleted: false,
-      },
-      include: {
-        doctor: true
       }
     })
 
-    return res.status(200).json({ id: newPatient.id })
+    return res.status(201).json({ id: newPatient.id })
   } catch (error) {
     console.error("Error creating patient:", error)
     return res.status(500).json({ error: "Internal server error" })
@@ -73,9 +94,7 @@ export const getPatientById = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ error: "Patient not found" })
     }
 
-    const { firstName, lastName, email, contactNumber } = patient
-
-    return res.status(200).json({ firstName, lastName, email, contactNumber })
+    return res.status(200).json({ ...patient })
   } catch (error) {
     console.error("Error fetching patient:", error)
     return res.status(500).json({ error: "Internal server error" })
@@ -85,31 +104,27 @@ export const getPatientById = async (req: CustomRequest, res: Response) => {
 export const updatePatientById = async (req: CustomRequest, res: Response) => {
   try {
     const { id } = req.params
-    const {
-      firstName,
-      lastName,
-      contactNumber,
-      doctorId,
-      email,
-    }: UpdatePatientRequest = req.body
+    const { firstName, lastName, contactNumber, email }: UpdatePatientRequest =
+      req.body
 
-    if (!firstName || !lastName || !contactNumber || !doctorId) {
+    if (!firstName || !lastName || !contactNumber) {
       return res.status(400).json({ error: "Missing required fields" })
     }
 
     await prisma.patient.update({
       relationLoadStrategy: "join",
-      where: { id, doctorId: req.user.doctorId,isDeleted: false },
+      where: { id, doctorId: req.user.doctorId, isDeleted: false, doctor: {
+        isDeleted: false
+      } },
       data: {
         firstName,
         lastName,
         contactNumber,
-        doctorId,
         email,
       },
       include: {
-        doctor: true
-      }
+        doctor: true,
+      },
     })
 
     return res
@@ -139,8 +154,8 @@ export const deletePatientById = async (req: CustomRequest, res: Response) => {
         deletedAt: new Date(),
       },
       include: {
-        doctor: true
-      }
+        doctor: true,
+      },
     })
 
     return res.status(200).json({ message: "Successfully deleted patient" })
@@ -161,23 +176,31 @@ export const getPaginatedPatients = async (
       limit: parseInt(limit as string),
     }
 
-    const totalCount = await prisma.patient.count()
+    const totalCount = await prisma.patient.count({
+      where: {
+        isDeleted: false,
+        doctor: {
+          isDeleted: false
+        }
+      }
+    })
+    
     const result: PaginatedPatientResponse = {}
 
     const data = await prisma.patient.findMany({
       relationLoadStrategy: "join",
       where: {
         doctorId: req.user.doctorId,
-        isDeleted: false
+        isDeleted: false,
       },
       skip: (query.page - 1) * query.limit,
       take: query.limit,
       include: {
-        doctor: true
-      }
+        doctor: true,
+      },
     })
 
-    if (query.page > 1) {
+    if (query.page > 1 && query.limit < totalCount) {
       result.previous = {
         limit: query.limit,
         page: query.page - 1,
