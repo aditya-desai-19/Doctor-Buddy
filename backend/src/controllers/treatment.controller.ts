@@ -34,10 +34,9 @@ const checkPatientExist = async (patientId: string): Promise<boolean> => {
   }
 }
 
-const getTreatment = async (id: string) => {
+export const getTreatment = async (id: string) => {
   try {
     const treatment = await prisma.treatment.findUnique({
-      relationLoadStrategy: "join",
       where: {
         id,
         isDeleted: false,
@@ -47,10 +46,7 @@ const getTreatment = async (id: string) => {
             isDeleted: false,
           },
         },
-      },
-      include: {
-        patient: true,
-      },
+      }
     })
 
     return treatment
@@ -124,7 +120,6 @@ export const updateTreatment = async (req: CustomRequest, res: Response) => {
     }
 
     await prisma.treatment.update({
-      relationLoadStrategy: "join",
       where: {
         id,
         isDeleted: false,
@@ -139,10 +134,7 @@ export const updateTreatment = async (req: CustomRequest, res: Response) => {
         name,
         cost,
         description,
-      },
-      include: {
-        patient: true,
-      },
+      }
     })
 
     res.status(200).json({ message: "Treatment updated successfully" })
@@ -163,7 +155,6 @@ export const deleteTreatment = async (req: CustomRequest, res: Response) => {
     }
 
     await prisma.treatment.update({
-      relationLoadStrategy: "join",
       where: {
         id,
         patient: {
@@ -176,10 +167,7 @@ export const deleteTreatment = async (req: CustomRequest, res: Response) => {
       data: {
         isDeleted: true,
         deletedAt: new Date(),
-      },
-      include: {
-        patient: true,
-      },
+      }
     })
 
     res.status(200).json({ message: "Treatment deleted successfully" })
@@ -221,7 +209,6 @@ export const getPaginatedTreatments = async (
     const result: PaginatedTreatmentResponse = {}
 
     const data = await prisma.treatment.findMany({
-      relationLoadStrategy: "join",
       where: {
         isDeleted: false,
         patientId: query.patientId,
@@ -233,10 +220,7 @@ export const getPaginatedTreatments = async (
         },
       },
       skip: (query.page - 1) * query.limit,
-      take: query.limit,
-      include: {
-        patient: true,
-      },
+      take: query.limit
     })
 
     if (query.page > 1 && query.limit < totalCount) {

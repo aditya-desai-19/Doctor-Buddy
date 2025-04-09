@@ -280,6 +280,99 @@ paths:
                 properties:
                   message: 
                     type: string
+  
+  /api/payment/:
+    post:
+      summary: Creates a payment 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '200':
+          description: Successfully created payment
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id: 
+                    type: string
+
+    get:
+      summary: Retrieve a list of payments
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: true
+          schema:
+            type: integer
+        - name: treatmentId
+          in: query
+          description: Patient id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of payments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentResponse'
+    
+  /api/payment/{id}:
+    get:
+      summary: Retrieves payment information
+      responses:
+        '200':
+          description: Successfully gets payment information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfo'
+
+    put:
+      summary: Updates payment information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdatePaymentRequest'
+      responses:
+        '200':
+          description: Successfully updates payment information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+
+    delete:
+      summary: Soft deletes payment
+      responses:
+        '200':
+          description: Successfully deleted treatment
+          content:
+            application/json:
+              schema:  
+                type: object
+                properties:
+                  message: 
+                    type: string
+    
 
 components:
   schemas:
@@ -466,7 +559,7 @@ components:
           type: integer
         isDeleted:
           type: boolean
-        doctorId:
+        patientId:
           type: string
         createdAt:
           type: string
@@ -508,3 +601,65 @@ components:
       required:
         - name
         - cost
+
+    Payment:
+      type: object
+      properties:
+        amount:
+          type: integer
+        treatmentId:
+          type: string
+      required:
+        - amount
+        - treatmentId
+    
+    PaymentInfo: 
+      type: object
+      required:
+        - id
+        - amount
+        - isDeleted
+        - treatmentId
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: string
+        amount:
+          type: integer
+        isDeleted:
+          type: boolean
+        treatmentId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+    
+    PaginatedPaymentResponse:
+      type: object
+      properties:
+        previous:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        next:
+          $ref: '#/components/schemas/PaginationInfo'
+          nullable: true
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/PaymentInfo'
+    
+    UpdatePaymentRequest:
+      type: object
+      properties:
+        amount: 
+          type: integer
+      required:
+        - amount

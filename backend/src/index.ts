@@ -5,6 +5,7 @@ import YAML from "yamljs"
 import doctorRouter from "./routes/doctor.route"
 import patientRouter from "./routes/patient.route"
 import treatmentRouter from "./routes/treatment.route"
+import paymentRouter from "./routes/payment.route"
 
 dotenv.config()
 
@@ -24,6 +25,7 @@ app.get("/", (_req, res) => {
 app.use("/api/doctor", doctorRouter)
 app.use("/api/patient", patientRouter)
 app.use("/api/treatment", treatmentRouter)
+app.use("/api/payment", paymentRouter)
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`)
