@@ -6,6 +6,7 @@ import doctorRouter from "./routes/doctor.route"
 import patientRouter from "./routes/patient.route"
 import treatmentRouter from "./routes/treatment.route"
 import paymentRouter from "./routes/payment.route"
+import cors from "cors"
 
 dotenv.config()
 
@@ -13,6 +14,8 @@ const app = express()
 const PORT = process.env.PORT || 3000
 
 app.use(express.json())
+//todo configure 
+app.use(cors())
 
 const swaggerDocument = YAML.load("./src/spec.yaml")
 
