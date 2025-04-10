@@ -40,6 +40,7 @@ const checkDoctorExist = async (doctorId: string) => {
         isDeleted: false,
       },
     })
+    return true
   } catch (error) {
     return null
   }
