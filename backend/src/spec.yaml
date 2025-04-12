@@ -57,12 +57,18 @@ paths:
               schema:
                 type: object
                 properties:
-                  token: 
+                  message: 
                     type: string
 
   /api/doctor/{id}:
     get:
       summary: Retrieves doctor's information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully gets doctor's information
@@ -73,6 +79,12 @@ paths:
 
     put:
       summary: Updates doctor's information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -92,6 +104,12 @@ paths:
 
     delete:
       summary: Soft deletes doctor
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully deleted doctor
@@ -149,6 +167,12 @@ paths:
   /api/patient/{id}:
     get:
       summary: Retrieves patient's information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully gets patient's information
@@ -159,6 +183,12 @@ paths:
 
     put:
       summary: Updates patient's information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -178,6 +208,12 @@ paths:
 
     delete:
       summary: Soft deletes patient
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully deleted patient
@@ -241,6 +277,12 @@ paths:
   /api/treatment/{id}:
     get:
       summary: Retrieves treatment information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully gets treatment information
@@ -251,6 +293,12 @@ paths:
 
     put:
       summary: Updates patient's information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -270,6 +318,12 @@ paths:
 
     delete:
       summary: Soft deletes treatment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully deleted treatment
@@ -333,6 +387,12 @@ paths:
   /api/payment/{id}:
     get:
       summary: Retrieves payment information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully gets payment information
@@ -343,6 +403,12 @@ paths:
 
     put:
       summary: Updates payment information
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -362,6 +428,12 @@ paths:
 
     delete:
       summary: Soft deletes payment
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         '200':
           description: Successfully deleted treatment

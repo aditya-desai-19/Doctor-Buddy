@@ -102,7 +102,17 @@ export const authenticateDoctor = async (req: Request, res: Response) => {
       }
       const secret = process.env.AUTH_SECRET || "doctorBuddy"
       const token = jwt.sign({ user: userDetails, exp: expiration }, secret)
-      return res.status(200).json({ token })
+      return res
+        .cookie("access_token", token, {
+          httpOnly: true,
+          secure: false, // ✅ false for local dev (no HTTPS)
+          sameSite: "lax", // or "strict" is fine too
+          maxAge: 24 * 60 * 60 * 1000,
+        })
+        .status(200)
+        .json({
+          message: "Login successfull",
+        })
     }
     return res.status(400).json({ message: "Password is incorrect" })
   } catch (error) {

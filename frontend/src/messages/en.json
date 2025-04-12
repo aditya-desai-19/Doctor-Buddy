@@ -1,0 +1,12 @@
+{
+  "Login": "Login",
+  "Email": "Email",
+  "Password": "Password",
+  "SignUp": "Sign up",
+  "FirstName": "First name",
+  "LastName": "Last name",
+  "Submit": "Submit",
+  "SignUpSuccessMsg": "Successfully signed up",
+  "SomeErrorOccured": "Some error occured",
+  "LoginSuccessMsg": "Login successfull"
+}
