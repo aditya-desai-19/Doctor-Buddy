@@ -7,6 +7,7 @@ import patientRouter from "./routes/patient.route"
 import treatmentRouter from "./routes/treatment.route"
 import paymentRouter from "./routes/payment.route"
 import cors from "cors"
+import summaryRouter from "./routes/summary.route"
 
 dotenv.config()
 
@@ -25,6 +26,7 @@ app.get("/", (_req, res) => {
   res.send("Hello World")
 })
 
+app.use("/api/summary", summaryRouter)
 app.use("/api/doctor", doctorRouter)
 app.use("/api/patient", patientRouter)
 app.use("/api/treatment", treatmentRouter)

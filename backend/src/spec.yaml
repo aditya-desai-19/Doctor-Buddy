@@ -444,7 +444,17 @@ paths:
                 properties:
                   message: 
                     type: string
-    
+  
+  /api/summary:
+    get:
+      summary: Return summary of patients, treatments and payment received
+      responses:
+        '200':
+          description: Return summary of patients, treatments and payment received
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Summary'
 
 components:
   schemas:
@@ -735,3 +745,13 @@ components:
           type: integer
       required:
         - amount
+      
+    Summary:
+      type: object
+      properties:
+        totalPatients:
+          type: integer
+        totalTreatments:
+          type: integer
+        totalPayments:
+          type: integer
