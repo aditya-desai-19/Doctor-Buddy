@@ -20,6 +20,7 @@ import { CreateDoctorRequest, LoginDoctorRequest } from "../../generated"
 import { handleLogin, handleSignUp } from "@/api/server"
 import { toastError, toastSuccess } from "./Toast"
 import { useRouter } from "next/navigation"
+import { useLoginStore } from "@/zustand/useLoginStore"
 
 type Props = {
   formSchema: any //todo
@@ -44,14 +45,14 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
   const t = useTranslations()
   const router = useRouter()
   const inputRef = useRef<any>(null) //todo 
-
+  const setIsLoggedIn = useLoginStore((state) => state.setIsLoggedIn)
+  
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(formSchema)
   })
 
   const onSubmit = useCallback(
     async (values: z.infer<typeof formSchema>) => {
-      form.reset()
       setIsLoading(true)
       if (isSignUp) {
         const data: CreateDoctorRequest = {
@@ -76,11 +77,22 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
         if (response) {
           router.push("/")
           toastSuccess(t("LoginSuccessMsg"))
+          setIsLoggedIn(true)
         } else {
           toastError(t("SomeErrorOccured"))
         }
       }
       setIsLoading(false)
+      form.reset(isSignUp ? {
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: ""
+      } : {
+        email: "",
+        password: ""
+      })
+      
     },
     [isSignUp, form]
   )
