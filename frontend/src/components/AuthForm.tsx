@@ -153,7 +153,7 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
   return (
     <>
       {isLoading && <FullPageSpinner />}
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center h-[calc(100%-64px)]">
         <div className="space-y-8 w-lg border-2 p-2 rounded-sm">
           <h2 className="text-center text-xl">
             {isSignUp ? t("SignUp") : t("Login")}

@@ -8,5 +8,9 @@
   "Submit": "Submit",
   "SignUpSuccessMsg": "Successfully signed up",
   "SomeErrorOccured": "Some error occured",
-  "LoginSuccessMsg": "Login successfull"
+  "LoginSuccessMsg": "Login successfull",
+  "DoctorBuddy": "Doctor Buddy",
+  "TotalPatients": "Total Patients",
+  "TotalTreatments": "Total Treatments",
+  "TotalPayments": "Total Payments"
 }

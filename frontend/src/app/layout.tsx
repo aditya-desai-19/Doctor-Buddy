@@ -1,7 +1,11 @@
+
 import { NextIntlClientProvider } from "next-intl"
 import { getLocale } from "next-intl/server"
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
+import Header from "@/components/Header"
+import { SidebarProvider } from "@/components/ui/sidebar"
+import AppSidebar from "@/components/AppSidebar"
 
 export default async function RootLayout({
   children,
@@ -11,10 +15,18 @@ export default async function RootLayout({
   const locale = await getLocale()
   return (
     <html lang={locale}>
-      <body>
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
-        <Toaster />
-      </body>
+      <NextIntlClientProvider>
+        <body>
+          <SidebarProvider>
+            <AppSidebar />
+            <main className="h-min-screen w-full">
+              <Header />
+              {children}
+            </main>
+            <Toaster />
+          </SidebarProvider>
+        </body>
+      </NextIntlClientProvider>
     </html>
   )
 }
