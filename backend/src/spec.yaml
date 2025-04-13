@@ -292,7 +292,7 @@ paths:
                 $ref: '#/components/schemas/TreatmentInfo'
 
     put:
-      summary: Updates patient's information
+      summary: Updates treatment information
       parameters:
       - name: id
         in: path
