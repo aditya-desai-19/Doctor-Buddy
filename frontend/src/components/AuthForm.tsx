@@ -17,7 +17,7 @@ import { useTranslations } from "next-intl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { FullPageSpinner } from "./LoadingSpinner"
 import { CreateDoctorRequest, LoginDoctorRequest } from "../../generated"
-import { handleLogin, handleSignUp } from "@/api/server"
+import { handleLogin, handleSignUp } from "@/api/action"
 import { toastError, toastSuccess } from "./Toast"
 import { useRouter } from "next/navigation"
 import { useLoginStore } from "@/zustand/useLoginStore"
@@ -111,6 +111,10 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
     }
   }, [inputRef.current, currentFocussedInputIdx])
 
+  const onNavigate = useCallback(() => {
+    isSignUp ? router.push("/login") : router.push("/sign-up")
+  }, [isSignUp])
+
   useEffect(() => {
     const emailInput: InputType = {
       name: "email",
@@ -153,15 +157,15 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
   return (
     <>
       {isLoading && <FullPageSpinner />}
-      <div className="flex items-center justify-center h-[calc(100%-64px)]">
-        <div className="space-y-8 w-lg border-2 p-2 rounded-sm">
-          <h2 className="text-center text-xl">
+      <div className="flex items-center justify-center h-[calc(100%-64px)] " >
+        <div className="space-y-8 w-lg border-2 p-2 shadow-md rounded-xl">
+          <h2 className="text-center text-xl font-semibold" style={{color: "var(--font-color)"}}>
             {isSignUp ? t("SignUp") : t("Login")}
           </h2>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8"
+              className="space-y-4 flex flex-col align-center"
               ref={inputRef}
               onKeyDown={onKeyDown}
             >
@@ -187,12 +191,15 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
                   )}
                 />
               ))}
+              <div className="flex justify-center">
               <Button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                className="bg-blue-600 hover:bg-blue-700 text-white w-36"
               >
                 {isSignUp ? t("Submit") : t("Login")}
               </Button>
+              </div>
+              <span className="text-center text-sm">{`${isSignUp ? t("Already") : t("Not")} ${"Registered"}?`}<Button variant={"link"} type="button" className="p-0 mx-2 text-blue-500 text-md" onClick={onNavigate}>{isSignUp ? t("Login") : t("SignUp")}</Button></span>
             </form>
           </Form>
         </div>

@@ -6,6 +6,9 @@ import { Toaster } from "@/components/ui/sonner"
 import Header from "@/components/Header"
 import { SidebarProvider } from "@/components/ui/sidebar"
 import AppSidebar from "@/components/AppSidebar"
+import { Open_Sans } from 'next/font/google'
+
+const openSans = Open_Sans()
 
 export default async function RootLayout({
   children,
@@ -14,7 +17,7 @@ export default async function RootLayout({
 }>) {
   const locale = await getLocale()
   return (
-    <html lang={locale}>
+    <html lang={locale} className={openSans.className}>
       <NextIntlClientProvider>
         <body>
           <SidebarProvider>

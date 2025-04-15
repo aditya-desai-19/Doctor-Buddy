@@ -12,5 +12,11 @@
   "DoctorBuddy": "Doctor Buddy",
   "TotalPatients": "Total Patients",
   "TotalTreatments": "Total Treatments",
-  "TotalPayments": "Total Payments"
+  "TotalPayments": "Total Payments",
+  "Patients":  "Patients",
+  "Treatments": "Treatments",
+  "Payments": "Payments",
+  "Registered": "registered",
+  "Not": "Not",
+  "Already": "Already" 
 }
