@@ -40,15 +40,16 @@ const ARROW_DOWN = "ArrowDown"
 export default function AuthForm({ formSchema, isSignUp }: Props) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [inputs, setInputs] = useState<InputType[]>([])
-  const [currentFocussedInputIdx, setCurrentFocussedInputIdx] = useState<number>(0)
+  const [currentFocussedInputIdx, setCurrentFocussedInputIdx] =
+    useState<number>(0)
 
   const t = useTranslations()
   const router = useRouter()
-  const inputRef = useRef<any>(null) //todo 
+  const inputRef = useRef<any>(null) //todo
   const setIsLoggedIn = useLoginStore((state) => state.setIsLoggedIn)
-  
+
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema)
+    resolver: zodResolver(formSchema),
   })
 
   const onSubmit = useCallback(
@@ -83,33 +84,41 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
         }
       }
       setIsLoading(false)
-      form.reset(isSignUp ? {
-        firstName: "",
-        lastName: "",
-        email: "",
-        password: ""
-      } : {
-        email: "",
-        password: ""
-      })
-      
+      form.reset(
+        isSignUp
+          ? {
+              firstName: "",
+              lastName: "",
+              email: "",
+              password: "",
+            }
+          : {
+              email: "",
+              password: "",
+            }
+      )
     },
     [isSignUp, form]
   )
 
-  const onKeyDown = useCallback((e: { key: string }) => {
-    if (inputRef.current) {
-      if(e.key == ARROW_UP) {
-        const idx = currentFocussedInputIdx === 0 ? 0 : currentFocussedInputIdx - 1;
-        inputRef.current[idx].focus()
+  const onKeyDown = useCallback(
+    (e: { key: string }) => {
+      if (inputRef.current) {
+        if (e.key == ARROW_UP) {
+          const idx =
+            currentFocussedInputIdx === 0 ? 0 : currentFocussedInputIdx - 1
+          inputRef.current[idx].focus()
+        } else if (e.key == ARROW_DOWN) {
+          const idx =
+            currentFocussedInputIdx === inputRef.current.length - 3
+              ? inputRef.current.length - 3
+              : currentFocussedInputIdx + 1
+          inputRef.current[idx].focus()
+        }
       }
-      else if(e.key == ARROW_DOWN) {
-        const idx = currentFocussedInputIdx === inputRef.current.length - 2 ? inputRef.current.length - 2 : currentFocussedInputIdx + 1;
-        console.log({idx})
-        inputRef.current[idx].focus()
-      }
-    }
-  }, [inputRef.current, currentFocussedInputIdx])
+    },
+    [inputRef.current, currentFocussedInputIdx]
+  )
 
   const onNavigate = useCallback(() => {
     isSignUp ? router.push("/login") : router.push("/sign-up")
@@ -157,9 +166,12 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
   return (
     <>
       {isLoading && <FullPageSpinner />}
-      <div className="flex items-center justify-center h-[calc(100%-64px)] " >
+      <div className="flex items-center justify-center h-[calc(100%-64px)] ">
         <div className="space-y-8 w-lg border-2 p-2 shadow-md rounded-xl">
-          <h2 className="text-center text-xl font-semibold" style={{color: "var(--font-color)"}}>
+          <h2
+            className="text-center text-xl font-semibold"
+            style={{ color: "var(--font-color)" }}
+          >
             {isSignUp ? t("SignUp") : t("Login")}
           </h2>
           <Form {...form}>
@@ -192,14 +204,24 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
                 />
               ))}
               <div className="flex justify-center">
-              <Button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white w-36"
-              >
-                {isSignUp ? t("Submit") : t("Login")}
-              </Button>
+                <Button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 text-white w-36"
+                >
+                  {isSignUp ? t("Submit") : t("Login")}
+                </Button>
               </div>
-              <span className="text-center text-sm">{`${isSignUp ? t("Already") : t("Not")} ${"Registered"}?`}<Button variant={"link"} type="button" className="p-0 mx-2 text-blue-500 text-md" onClick={onNavigate}>{isSignUp ? t("Login") : t("SignUp")}</Button></span>
+              <span className="text-center text-sm">
+                {`${isSignUp ? t("Already") : t("Not")} ${"Registered"}?`}
+                <Button
+                  variant={"link"}
+                  type="button"
+                  className="p-0 mx-2 text-blue-500 text-md cursor-pointer"
+                  onClick={onNavigate}
+                >
+                  {isSignUp ? t("Login") : t("SignUp")}
+                </Button>
+              </span>
             </form>
           </Form>
         </div>

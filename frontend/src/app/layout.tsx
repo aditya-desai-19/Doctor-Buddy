@@ -5,7 +5,6 @@ import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 import Header from "@/components/Header"
 import { SidebarProvider } from "@/components/ui/sidebar"
-import AppSidebar from "@/components/AppSidebar"
 import { Open_Sans } from 'next/font/google'
 
 const openSans = Open_Sans()
@@ -21,7 +20,6 @@ export default async function RootLayout({
       <NextIntlClientProvider>
         <body>
           <SidebarProvider>
-            <AppSidebar />
             <main className="h-min-screen w-full">
               <Header />
               {children}

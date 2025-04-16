@@ -1,7 +1,8 @@
 "use server"
 
-import { CreateDoctorRequest, LoginDoctorRequest } from "../../generated"
+import { CreateDoctorRequest, LoginDoctorRequest, Summary } from "../../generated"
 import apiClient from "./client"
+import { cookies } from 'next/headers'
 
 const apiClientInstance = apiClient()
 
@@ -29,5 +30,21 @@ export const handleLogin = async (data: LoginDoctorRequest): Promise<boolean> =>
   } catch (error) {
     console.error(error)
     return false
+  }
+}
+
+export const getSummary = async (): Promise<Summary | null> => {
+  try {
+    const cookieStore = await cookies()
+    const at = cookieStore.get('access_token')
+    const result = await apiClientInstance.apiSummaryGet()
+    console.log({result})
+    if(result.status === 200) {
+      return result.data
+    }
+    throw new Error("Failed to fetch summary")
+  } catch (error) {
+    console.error(error)
+    return null
   }
 }
