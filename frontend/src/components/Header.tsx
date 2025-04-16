@@ -6,12 +6,21 @@ import { useTranslations } from "next-intl"
 import { useLoginStore } from "@/zustand/useLoginStore"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 
-export default function Header() {
-  const isLoggedIn = useLoginStore((state) => state.isLoggedIn)
+type Props = {
+  isCookieExist: boolean
+}
+
+export default function Header({isCookieExist}: Props) {
+  const {isLoggedIn, setIsLoggedIn} = useLoginStore((state) => state)
 
   const t = useTranslations()
   const router = useRouter()
+
+  useEffect(() => {
+    setIsLoggedIn(isCookieExist)
+  }, [])
 
   return (
     <nav className="w-full px-6 py-4 shadow-md" >

@@ -1,15 +1,21 @@
 "use server"
 
-import { CreateDoctorRequest, LoginDoctorRequest, Summary } from "../../generated"
+import { ACCESS_TOKEN_KEY } from "@/common/constants"
+import {
+  CreateDoctorRequest,
+  LoginDoctorRequest,
+  Summary,
+} from "../../generated"
 import apiClient from "./client"
-import { cookies } from 'next/headers'
+import { cookies } from "next/headers"
 
-const apiClientInstance = apiClient()
 
-export const handleSignUp = async (data: CreateDoctorRequest): Promise<boolean> => {
+export const handleSignUp = async (
+  data: CreateDoctorRequest
+): Promise<boolean> => {
   try {
-    const result = await apiClientInstance.apiDoctorSignUpPost(data)
-    if(result.status === 201) {
+    const result = await apiClient().apiDoctorSignUpPost(data)
+    if (result.status === 201) {
       return true
     }
     throw new Error("Sign up api failure")
@@ -19,11 +25,17 @@ export const handleSignUp = async (data: CreateDoctorRequest): Promise<boolean> 
   }
 }
 
-
-export const handleLogin = async (data: LoginDoctorRequest): Promise<boolean> => {
+export const handleLogin = async (
+  data: LoginDoctorRequest
+): Promise<boolean> => {
   try {
-    const result = await apiClientInstance.apiDoctorLoginPost(data)
-    if(result.status === 200) {
+    const result = await apiClient().apiDoctorLoginPost(data)
+    if (result.status === 200) {
+      console.log({ token: result.data })
+      const cookieStore = await cookies()
+      cookieStore.set(ACCESS_TOKEN_KEY, result.data.token!, {
+        maxAge: 60 * 60 * 24 * 1000,
+      })
       return true
     }
     throw new Error("Login api failure")
@@ -36,10 +48,10 @@ export const handleLogin = async (data: LoginDoctorRequest): Promise<boolean> =>
 export const getSummary = async (): Promise<Summary | null> => {
   try {
     const cookieStore = await cookies()
-    const at = cookieStore.get('access_token')
-    const result = await apiClientInstance.apiSummaryGet()
-    console.log({result})
-    if(result.status === 200) {
+    const accessToken = cookieStore.get(ACCESS_TOKEN_KEY)
+    const clientInstance = apiClient(accessToken?.value)
+    const result = await clientInstance.apiSummaryGet()
+    if (result.status === 200) {
       return result.data
     }
     throw new Error("Failed to fetch summary")

@@ -63,6 +63,8 @@ paths:
   /api/doctor/{id}:
     get:
       summary: Retrieves doctor's information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -79,6 +81,8 @@ paths:
 
     put:
       summary: Updates doctor's information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -104,6 +108,8 @@ paths:
 
     delete:
       summary: Soft deletes doctor
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -123,7 +129,9 @@ paths:
 
   /api/patient/:
     post:
-      summary: Creates a patient 
+      summary: Creates a patient
+      security:
+        - BearerAuth: [] 
       requestBody:
         required: true
         content:
@@ -143,6 +151,8 @@ paths:
     
     get:
       summary: Retrieve a list of patients
+      security:
+        - BearerAuth: []
       parameters:
         - name: page
           in: query
@@ -167,6 +177,8 @@ paths:
   /api/patient/{id}:
     get:
       summary: Retrieves patient's information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -183,6 +195,8 @@ paths:
 
     put:
       summary: Updates patient's information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -208,6 +222,8 @@ paths:
 
     delete:
       summary: Soft deletes patient
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -227,7 +243,9 @@ paths:
 
   /api/treatment/:
     post:
-      summary: Creates a treatment 
+      summary: Creates a treatment
+      security:
+        - BearerAuth: [] 
       requestBody:
         required: true
         content:
@@ -247,6 +265,8 @@ paths:
     
     get:
       summary: Retrieve a list of treatments
+      security:
+        - BearerAuth: []
       parameters:
         - name: page
           in: query
@@ -277,6 +297,8 @@ paths:
   /api/treatment/{id}:
     get:
       summary: Retrieves treatment information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -293,6 +315,8 @@ paths:
 
     put:
       summary: Updates treatment information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -318,6 +342,8 @@ paths:
 
     delete:
       summary: Soft deletes treatment
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -337,7 +363,9 @@ paths:
   
   /api/payment/:
     post:
-      summary: Creates a payment 
+      summary: Creates a payment
+      security:
+        - BearerAuth: [] 
       requestBody:
         required: true
         content:
@@ -357,6 +385,8 @@ paths:
 
     get:
       summary: Retrieve a list of payments
+      security:
+        - BearerAuth: []
       parameters:
         - name: page
           in: query
@@ -387,6 +417,8 @@ paths:
   /api/payment/{id}:
     get:
       summary: Retrieves payment information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -403,6 +435,8 @@ paths:
 
     put:
       summary: Updates payment information
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -428,6 +462,8 @@ paths:
 
     delete:
       summary: Soft deletes payment
+      security:
+        - BearerAuth: []
       parameters:
       - name: id
         in: path
@@ -448,6 +484,8 @@ paths:
   /api/summary:
     get:
       summary: Return summary of patients, treatments and payment received
+      security:
+        - BearerAuth: []
       responses:
         '200':
           description: Return summary of patients, treatments and payment received
@@ -755,3 +793,9 @@ components:
           type: integer
         totalPayments:
           type: integer
+  
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

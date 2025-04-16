@@ -12,13 +12,11 @@ import summaryRouter from "./routes/summary.route"
 dotenv.config()
 
 const app = express()
-const PORT = process.env.PORT || 4000
+const PORT = process.env.PORT || 3000
 
 app.use(express.json())
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true, 
-}))
+//todo configure
+app.use(cors())
 
 const swaggerDocument = YAML.load("./src/spec.yaml")
 

@@ -1,47 +1,77 @@
 "use client"
 
-import { useLoginStore } from "@/zustand/useLoginStore"
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { getSummary } from "@/api/action"
+import { toastError } from "@/components/Toast"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { useSummaryStore } from "@/zustand/useSummaryStore"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useLoginStore } from "@/zustand/useLoginStore"
+import { useQuery } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 
-const Tile = ({ title, number }: { title: string; number: number }) => {
+const Tile = ({
+  title,
+  number,
+  isLoading,
+}: {
+  title: string
+  number: string
+  isLoading: boolean
+}) => {
   return (
     <Card className="rounded-2xl m-4 shadow-md w-sm">
       <CardHeader>
         <CardTitle className="text-lg text-gray-700">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-3xl font-bold text-blue-600">{number}</p>
+        {isLoading ? (
+          <Skeleton className="h-10 w-" />
+        ) : (
+          <p className="text-3xl font-bold text-blue-600">{number}</p>
+        )}
       </CardContent>
     </Card>
   )
 }
 
 export default function Home() {
-  const isLoggedIn = useLoginStore(state => state.isLoggedIn)
-  const { totalPatients, totalPayments, totalTreatments } = useSummaryStore(
-    (state) => state
-  )
+  const isLoggedIn = useLoginStore((state) => state.isLoggedIn)
+
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["summary"],
+    queryFn: getSummary,
+  })
 
   const t = useTranslations()
-  const router = useRouter()
 
-  useEffect(() => {
-    if(!isLoggedIn) {
-      router.push("/login")
-    }
-  }, [isLoggedIn])
+  if(isError) {
+    toastError(error.message)
+  }
 
   return (
     <>
+    {isLoggedIn ? 
       <div className="flex flex-wrap">
-        <Tile title={t("TotalPatients")} number={totalPatients} />
-        <Tile title={t("TotalTreatments")} number={totalTreatments} />
-        <Tile title={t("TotalPayments")} number={totalPayments} />
+        <Tile
+          title={t("TotalPatients")}
+          number={`${data?.totalPatients || 0}`}
+          isLoading={isPending}
+        />
+        <Tile
+          title={t("TotalTreatments")}
+          number={`${data?.totalTreatments || 0}`}
+          isLoading={isPending}
+        />
+        <Tile
+          title={t("TotalPayments")}
+          number={`₹ ${data?.totalPayments || 0}`}
+          isLoading={isPending}
+        />
       </div>
+      : 
+      <div>
+        <h1>Home page</h1>
+      </div>
+    }
     </>
   )
 }
