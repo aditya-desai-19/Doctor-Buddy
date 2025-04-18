@@ -590,10 +590,9 @@ components:
         - firstName
         - lastName
         - contactNumber
-        - isDeleted
-        - doctorId
+        - email
+        - _count
         - createdAt
-        - updatedAt
       properties:
         id:
           type: string
@@ -603,24 +602,16 @@ components:
           type: string
         contactNumber:
           type: string
-        isDeleted:
-          type: boolean
-        doctorId:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
         email:
           type: string
           format: email
           nullable: true
-        deletedAt:
+        _count:
+          type: integer
+        createdAt:
           type: string
           format: date-time
-          nullable: true
+        
 
     PaginationInfo:
       type: object

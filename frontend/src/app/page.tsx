@@ -50,7 +50,7 @@ export default function Home() {
   return (
     <>
     {isLoggedIn ? 
-      <div className="flex flex-wrap">
+      <div className="flex flex-wrap mx-20">
         <Tile
           title={t("TotalPatients")}
           number={`${data?.totalPatients || 0}`}

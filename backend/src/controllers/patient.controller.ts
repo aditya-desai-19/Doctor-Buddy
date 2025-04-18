@@ -186,17 +186,28 @@ export const getPaginatedPatients = async (
 
     const result: PaginatedPatientResponse = {}
 
-    const data = await prisma.patient.findMany({
-      where: {
-        doctorId: req.user.doctorId,
-        isDeleted: false,
-        doctor: {
-          isDeleted: false
-        }
-      },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit
-    })
+    const rawData: any[] = await prisma.$queryRaw`
+      SELECT 
+        p.id,
+        p."firstName" ,
+        p."lastName" ,
+        p."contactNumber",
+        p.email,
+        COUNT(t.id) AS total_treatments
+      FROM "Patient" p  
+      LEFT JOIN "Treatment" t 
+        ON p.id = t."patientId" AND t."isDeleted" = false AND p."isDeleted" = false
+      JOIN "Doctor" d 
+        ON p."doctorId" = d.id AND d."isDeleted" = false AND d.id = ${req.user.doctorId}
+      GROUP BY p.id, p."firstName", p."lastName", p."contactNumber", p.email
+      LIMIT ${query.limit}
+      OFFSET ${(query.page - 1) * query.limit};
+    `
+
+    const data = rawData.map((row) => ({
+      ...row,
+      total_treatments: Number(row.total_treatments), 
+    }))
 
     if (query.page > 1 && query.limit < totalCount) {
       result.previous = {
