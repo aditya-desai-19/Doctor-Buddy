@@ -32,7 +32,7 @@ export const LoadingSpinner = ({
 export function FullPageSpinner() {
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.2)] z-50 flex items-center justify-center">
-      <LoadingSpinner size={40} />
+      <LoadingSpinner size={40} className="text-blue-900"/>
     </div>
   )
 }

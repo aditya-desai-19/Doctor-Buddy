@@ -47,6 +47,7 @@
   /* my variables*/
   --font-color: #1a1a1a;
   --border-color: #E0E0E0;
+  --button-primary: #337ab7;
 
   --radius: 0.625rem;
   --background: oklch(1 0 0);

@@ -1,15 +1,19 @@
 "use server"
 
 import { ACCESS_TOKEN_KEY } from "@/common/constants"
+import { UpdatePatientWithIdRequest } from "@/common/types"
+import { cookies } from "next/headers"
 import {
+  ApiPatientPost201Response,
   CreateDoctorRequest,
+  CreatePatientRequest,
   DefaultApi,
   LoginDoctorRequest,
   PaginatedPatientResponse,
-  Summary,
+  PatientInfo,
+  Summary
 } from "../../generated"
 import apiClient from "./client"
-import { cookies } from "next/headers"
 
 export const handleSignUp = async (
   data: CreateDoctorRequest
@@ -58,14 +62,45 @@ const getApiClientWithToken = async (): Promise<DefaultApi | null> => {
 }
 
 export const getSummary = async (): Promise<Summary | null> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const result = await clientInstance.apiSummaryGet()
+    if (result.status === 200) {
+      return result.data
+    }
+    throw new Error("Failed to fetch summary")
+  }
+  throw new Error("Failed to get api client")
+}
+
+export const getPatients =
+  async (): Promise<PaginatedPatientResponse | null> => {
+    try {
+      const clientInstance = await getApiClientWithToken()
+      if (clientInstance) {
+        const result = await clientInstance.apiPatientGet(1, 10)
+        if (result.status === 200) {
+          return result.data
+        }
+      }
+      throw new Error("Failed to get api client")
+    } catch (error) {
+      console.error(error)
+      return null
+    }
+  }
+
+export const createPatient = async (
+  data: CreatePatientRequest
+): Promise<ApiPatientPost201Response | null> => {
   try {
     const clientInstance = await getApiClientWithToken()
-    if(clientInstance) {
-      const result = await clientInstance.apiSummaryGet()
-      if (result.status === 200) {
-        return result.data
+    if (clientInstance) {
+      const response = await clientInstance.apiPatientPost(data)
+      if (response.status === 201) {
+        return response.data
       }
-      throw new Error("Failed to fetch summary")
+      throw new Error("Failed to create patient")
     }
     throw new Error("Failed to get api client")
   } catch (error) {
@@ -74,18 +109,35 @@ export const getSummary = async (): Promise<Summary | null> => {
   }
 }
 
-export const getPatients = async (): Promise<PaginatedPatientResponse | null> => {
-  try {
-    const clientInstance = await getApiClientWithToken()
-    if(clientInstance) {
-      const result = await clientInstance.apiPatientGet(1, 10)
-      if (result.status === 200) {
-        return result.data
-      }
+export const updatePatient = async (
+  data: UpdatePatientWithIdRequest
+): Promise<boolean | null> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const { firstName, lastName, email, contactNumber, id } = data
+    const newData = {
+      firstName,
+      lastName,
+      email,
+      contactNumber,
     }
-    throw new Error("Failed to get api client")
-  } catch (error) {
-    console.error(error)
-    return null
+    const response = await clientInstance.apiPatientIdPut(id, newData)
+    if (response.status === 200) {
+      return true
+    }
+    throw new Error("Failed to create patient")
   }
+  throw new Error("Failed to get api client")
+}
+
+export const getPatient = async (id: string): Promise<PatientInfo> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPatientIdGet(id)
+    if (response.status === 200) {
+      return response.data
+    }
+    throw new Error("Failed to get patient")
+  }
+  throw new Error("Failed to get api client")
 }

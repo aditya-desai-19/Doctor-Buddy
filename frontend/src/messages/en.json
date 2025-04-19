@@ -18,5 +18,13 @@
   "Payments": "Payments",
   "Registered": "registered",
   "Not": "Not",
-  "Already": "Already" 
+  "Already": "Already",
+  "SuccessfullyCreatedPatient": "Successfully created patient",
+  "ContactNumber": "Contact number",
+  "Save": "Save",
+  "EditPatient": "Edit Patient",
+  "CreatePatient": "Create Patient",
+  "PersonalInformation": "Personal information",
+  "SuccessfullyUpdatedPatientDetails": "Successfully updated patient's details",
+  "BackToList": "Back to list"
 }
