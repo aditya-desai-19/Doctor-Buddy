@@ -196,10 +196,11 @@ export const getPaginatedPatients = async (
         COUNT(t.id) AS total_treatments
       FROM "Patient" p  
       LEFT JOIN "Treatment" t 
-        ON p.id = t."patientId" AND t."isDeleted" = false AND p."isDeleted" = false
+        ON p.id = t."patientId"
       JOIN "Doctor" d 
-        ON p."doctorId" = d.id AND d."isDeleted" = false AND d.id = ${req.user.doctorId}
-      GROUP BY p.id, p."firstName", p."lastName", p."contactNumber", p.email
+        ON p."doctorId" = d.id AND d.id = ${req.user.doctorId}
+      WHERE d."isDeleted" = false AND p."isDeleted" = false
+      GROUP BY p.id
       LIMIT ${query.limit}
       OFFSET ${(query.page - 1) * query.limit};
     `
