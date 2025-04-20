@@ -141,3 +141,14 @@ export const getPatient = async (id: string): Promise<PatientInfo> => {
   }
   throw new Error("Failed to get api client")
 }
+
+export const deletePatient = async (id: string): Promise<boolean> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPatientIdDelete(id)
+    if(response.status === 200) {
+      return true
+    }
+  }
+  throw new Error("Failed to get api client")
+}

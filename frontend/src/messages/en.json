@@ -26,5 +26,12 @@
   "CreatePatient": "Create Patient",
   "PersonalInformation": "Personal information",
   "SuccessfullyUpdatedPatientDetails": "Successfully updated patient's details",
-  "BackToList": "Back to list"
+  "BackToList": "Back to list",
+  "Cancel": "Cancel",
+  "Delete": "Delete",
+  "DeleteDialogTitle": "Are you sure you want to delete?",
+  "DeleteSuccessMsg": "Successfully deleted patient",
+  "Edit": "Edit",
+  "Create": "Create",
+  "NoResults": "No results."
 }
