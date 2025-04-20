@@ -14,6 +14,9 @@ type GetPatientRequest = paths["/api/patient/"]["get"]["parameters"]["query"]
 type PaginatedPatientResponse =
   paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]
 
+type GetFilteredPatientRequest =
+  paths["/api/patient/search"]["get"]["parameters"]["query"]
+
 const getPatient = async (id: string, doctorId: string) => {
   try {
     return await prisma.patient.findUnique({
@@ -193,6 +196,7 @@ export const getPaginatedPatients = async (
         p."lastName" ,
         p."contactNumber",
         p.email,
+        p."createdAt",
         COUNT(t.id) AS total_treatments
       FROM "Patient" p  
       LEFT JOIN "Treatment" t 
@@ -207,7 +211,84 @@ export const getPaginatedPatients = async (
 
     const data = rawData.map((row) => ({
       ...row,
-      total_treatments: Number(row.total_treatments), 
+      total_treatments: Number(row.total_treatments),
+    }))
+
+    if (query.page > 1 && query.limit < totalCount) {
+      result.previous = {
+        limit: query.limit,
+        page: query.page - 1,
+      }
+    }
+
+    const currItems = (query.page - 1) * query.limit + query.limit
+    if (currItems < totalCount) {
+      result.next = {
+        limit: query.limit,
+        page: query.page + 1,
+      }
+    }
+
+    //@ts-ignore
+    result.data = data
+    return res.status(200).json({ ...result })
+  } catch (error) {
+    console.error("Error fetching patient:", error)
+    return res.status(500).json({ error: "Internal server error" })
+  }
+}
+
+export const getFilteredPaginatedPatients = async (
+  req: CustomRequest,
+  res: Response
+) => {
+  try {
+    const { page, limit, search } = req.query
+    const query: GetFilteredPatientRequest = {
+      page: parseInt(page as string),
+      limit: parseInt(limit as string),
+      search: `${search}`,
+    }
+
+    const totalCount = await prisma.patient.count({
+      where: {
+        isDeleted: false,
+        doctor: {
+          isDeleted: false,
+        },
+      },
+    })
+
+    const result: PaginatedPatientResponse = {}
+
+    const rawData: any[] = await prisma.$queryRaw`
+      SELECT 
+        p.id,
+        p."firstName" ,
+        p."lastName" ,
+        p."contactNumber",
+        p.email,
+        p."createdAt",
+        COUNT(t.id) AS total_treatments
+      FROM "Patient" p  
+      LEFT JOIN "Treatment" t 
+        ON p.id = t."patientId"
+      JOIN "Doctor" d 
+        ON p."doctorId" = d.id AND d.id = ${req.user.doctorId}
+      WHERE d."isDeleted" = false AND p."isDeleted" = false AND (
+        LOWER(p."firstName") LIKE LOWER(${`%${query.search}%`}) OR
+        LOWER(p."lastName") LIKE LOWER(${`%${query.search}%`}) OR
+        LOWER(p."email") LIKE LOWER(${`%${query.search}%`}) OR
+        LOWER(p."contactNumber") LIKE LOWER(${`%${query.search}%`})
+      )
+      GROUP BY p.id
+      LIMIT ${query.limit}
+      OFFSET ${(query.page - 1) * query.limit};
+    `
+
+    const data = rawData.map((row) => ({
+      ...row,
+      total_treatments: Number(row.total_treatments),
     }))
 
     if (query.page > 1 && query.limit < totalCount) {

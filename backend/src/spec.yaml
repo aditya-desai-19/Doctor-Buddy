@@ -241,6 +241,38 @@ paths:
                   message: 
                     type: string
 
+  /api/patient/search:
+    get:
+      summary: Retrieves filtered a list of patients
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Page number
+          required: true
+          schema:
+            type: integer
+        - name: limit
+          in: query
+          description: Maximum number of items to return
+          required: true
+          schema:
+            type: integer
+        - name: search
+          in: query
+          description: Search text
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of filtered patients
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientResponse'
+
   /api/treatment/:
     post:
       summary: Creates a treatment

@@ -2,6 +2,7 @@ import express from "express"
 import {
   createPatient,
   deletePatientById,
+  getFilteredPaginatedPatients,
   getPaginatedPatients,
   getPatientById,
   updatePatientById,
@@ -12,6 +13,8 @@ const patientRouter = express.Router()
 
 //@ts-ignore
 patientRouter.get("/", verifyToken(), getPaginatedPatients)
+//@ts-ignore
+patientRouter.get("/search", verifyToken(), getFilteredPaginatedPatients)
 //@ts-ignore
 patientRouter.post("/", verifyToken(), createPatient)
 //@ts-ignore

@@ -152,3 +152,15 @@ export const deletePatient = async (id: string): Promise<boolean> => {
   }
   throw new Error("Failed to get api client")
 }
+
+export const searchPatient = async (text: string): Promise<PaginatedPatientResponse> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPatientSearchGet(1, 10, text)
+    if(response.status === 200) {
+      console.log({data: response.data})
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}

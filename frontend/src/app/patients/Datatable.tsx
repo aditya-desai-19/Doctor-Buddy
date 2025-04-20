@@ -21,10 +21,13 @@ import { useRouter } from "next/navigation"
 import AlertDialogComponent from "@/components/AlertDialogComponent"
 import { useTranslations } from "next-intl"
 import { useMutation } from "@tanstack/react-query"
-import { deletePatient } from "@/api/action"
+import { deletePatient, searchPatient } from "@/api/action"
 import { toastError, toastSuccess } from "@/components/Toast"
 import { usePatientStore } from "@/zustand/usePatient"
 import { PatientInfo } from "../../../generated"
+import { Input } from "@/components/ui/input"
+import { FullPageSpinner } from "@/components/LoadingSpinner"
+import {debounce} from "lodash"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -36,12 +39,15 @@ export default function DataTable<TData, TValue>({
   data,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
-  const {patients, setPatients, removePatient} = usePatientStore(state => state)
+  const [isSearching, setIsSearching] = useState<boolean>()
+  const { patients, setPatients, removePatient } = usePatientStore(
+    (state) => state
+  )
   const t = useTranslations()
   const router = useRouter()
 
   const mutation = useMutation({
-    mutationFn: deletePatient
+    mutationFn: deletePatient,
   })
 
   const table = useReactTable({
@@ -63,7 +69,7 @@ export default function DataTable<TData, TValue>({
   }, [selectedRow])
 
   const onDelete = useCallback(() => {
-    if(selectedRow) {
+    if (selectedRow) {
       //@ts-ignore
       removePatient(selectedRow.id)
       //@ts-ignore
@@ -73,17 +79,32 @@ export default function DataTable<TData, TValue>({
         },
         onError: () => {
           toastError(t("SomeErrorOccured"))
-        }
+        },
       })
     }
   }, [selectedRow])
 
+  const onSearchTextChange = useCallback(debounce(async (e: any) => {
+    setIsSearching(true)
+    const filteredData = await searchPatient(e.target.value)
+    filteredData
+      ? setPatients(filteredData.data as unknown as PatientInfo[])
+      : toastError(t("SomeErrorOccured"))
+    setIsSearching(false)
+  }, 300), [])
+
   useEffect(() => {
     setPatients(data as unknown as PatientInfo[])
-  }, [data])
+  }, [])
 
   return (
     <div>
+      {isSearching && <FullPageSpinner />}
+      <Input
+        placeholder="Search..."
+        className="w-1/4 my-2"
+        onChange={onSearchTextChange}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
