@@ -33,5 +33,10 @@
   "DeleteSuccessMsg": "Successfully deleted patient",
   "Edit": "Edit",
   "Create": "Create",
-  "NoResults": "No results."
+  "NoResults": "No results.",
+  "MyAccount": "MyAccount",
+  "Profile": "Profile",
+  "Logout": "Log out",
+  "Hello": "Hello",
+  "EmailAddress": "Email Address"
 }

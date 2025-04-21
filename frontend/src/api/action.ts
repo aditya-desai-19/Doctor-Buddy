@@ -8,10 +8,12 @@ import {
   CreateDoctorRequest,
   CreatePatientRequest,
   DefaultApi,
+  DoctorInfoResponse,
   LoginDoctorRequest,
   PaginatedPatientResponse,
   PatientInfo,
-  Summary
+  Summary,
+  UpdateDoctorInfoRequest,
 } from "../../generated"
 import apiClient from "./client"
 
@@ -36,7 +38,6 @@ export const handleLogin = async (
   try {
     const result = await apiClient().apiDoctorLoginPost(data)
     if (result.status === 200) {
-      console.log({ token: result.data })
       const cookieStore = await cookies()
       cookieStore.set(ACCESS_TOKEN_KEY, result.data.token!, {
         maxAge: 60 * 60 * 24,
@@ -146,19 +147,58 @@ export const deletePatient = async (id: string): Promise<boolean> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiPatientIdDelete(id)
-    if(response.status === 200) {
+    if (response.status === 200) {
       return true
     }
   }
   throw new Error("Failed to get api client")
 }
 
-export const searchPatient = async (text: string): Promise<PaginatedPatientResponse> => {
+export const searchPatient = async (
+  text: string
+): Promise<PaginatedPatientResponse> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiPatientSearchGet(1, 10, text)
-    if(response.status === 200) {
-      console.log({data: response.data})
+    if (response.status === 200) {
+      console.log({ data: response.data })
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+export const getDoctorDetails = async (): Promise<DoctorInfoResponse | null> => {
+  try {
+    const clientInstance = await getApiClientWithToken()
+    if (clientInstance) {
+      const response = await clientInstance.apiDoctorGet()
+      if (response.status === 200) {
+        return response.data
+      }
+    }
+    throw new Error("Failed to get api client")
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const handleLogout = async() => {
+  try {
+    const cookieStore = await cookies()
+    cookieStore.delete(ACCESS_TOKEN_KEY)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+//todo improve spec redundant type UpdateDoctorInfoRequest
+export const saveDoctorInfo = async(values: UpdateDoctorInfoRequest) => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiDoctorPut(values)
+    if (response.status === 200) {
       return response.data
     }
   }

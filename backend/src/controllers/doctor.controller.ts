@@ -102,11 +102,9 @@ export const authenticateDoctor = async (req: Request, res: Response) => {
       }
       const secret = process.env.AUTH_SECRET || "doctorBuddy"
       const token = jwt.sign({ user: userDetails, exp: expiration }, secret)
-      return res
-        .status(200)
-        .json({
-          token
-        })
+      return res.status(200).json({
+        token,
+      })
     }
     return res.status(400).json({ message: "Password is incorrect" })
   } catch (error) {
@@ -117,15 +115,9 @@ export const authenticateDoctor = async (req: Request, res: Response) => {
 
 export const getDoctorById = async (req: CustomRequest, res: Response) => {
   try {
-    const { id } = req.params
-
-    if (req.user.doctorId != id) {
-      return res.status(403).json({ message: "Unauthorized request" })
-    }
-
     const response: DoctorResponse = await prisma.doctor.findUnique({
       where: {
-        id,
+        id: req.user.doctorId,
       },
     })
 
@@ -148,26 +140,20 @@ export const getDoctorById = async (req: CustomRequest, res: Response) => {
 
 export const updateDoctor = async (req: CustomRequest, res: Response) => {
   try {
-    const { id } = req.params
-
-    if (req.user.doctorId != id) {
-      return res.status(403).json({ message: "Unauthorized request" })
-    }
-
     const { firstName, lastName, email } = req.body
 
     if (!firstName || !lastName || !email) {
       return res.status(400).json({ message: "All fields are required." })
     }
 
-    const existingDoctor = await prisma.doctor.findUnique({ where: { id } })
+    const existingDoctor = await prisma.doctor.findUnique({ where: { id: req.user.doctorId } })
 
     if (!existingDoctor || existingDoctor.isDeleted) {
       return res.status(404).json({ message: "Doctor not found" })
     }
 
     await prisma.doctor.update({
-      where: { id },
+      where: { id: req.user.doctorId },
       data: {
         firstName,
         lastName,
@@ -186,14 +172,8 @@ export const updateDoctor = async (req: CustomRequest, res: Response) => {
 
 export const deleteDoctor = async (req: CustomRequest, res: Response) => {
   try {
-    const { id } = req.params
-
-    if (req.user.doctorId != id) {
-      return res.status(403).json({ message: "Unauthorized request" })
-    }
-
     const existingDoctor = await prisma.doctor.findUnique({
-      where: { id },
+      where: { id: req.user.doctorId },
     })
 
     if (!existingDoctor || existingDoctor.isDeleted) {
@@ -201,7 +181,7 @@ export const deleteDoctor = async (req: CustomRequest, res: Response) => {
     }
 
     await prisma.doctor.update({
-      where: { id },
+      where: { id: req.user.doctorId },
       data: {
         isDeleted: true,
         deletedAt: new Date(),

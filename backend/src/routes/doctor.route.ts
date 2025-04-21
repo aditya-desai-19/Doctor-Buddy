@@ -15,10 +15,10 @@ doctorRouter.post("/sign-up", registerDoctor)
 //@ts-ignore
 doctorRouter.post("/login", authenticateDoctor)
 //@ts-ignore
-doctorRouter.get("/:id", verifyToken(), getDoctorById)
+doctorRouter.get("/", verifyToken(), getDoctorById)
 //@ts-ignore
-doctorRouter.put("/:id", verifyToken(), updateDoctor)
+doctorRouter.put("/", verifyToken(), updateDoctor)
 //@ts-ignore
-doctorRouter.delete("/:id", verifyToken(), deleteDoctor)
+doctorRouter.delete("/", verifyToken(), deleteDoctor)
 
 export default doctorRouter

@@ -59,18 +59,12 @@ paths:
                 properties:
                   token: 
                     type: string
-
-  /api/doctor/{id}:
+  
+  /api/doctor/:
     get:
       summary: Retrieves doctor's information
       security:
         - BearerAuth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
       responses:
         '200':
           description: Successfully gets doctor's information
@@ -83,12 +77,6 @@ paths:
       summary: Updates doctor's information
       security:
         - BearerAuth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
       requestBody:
         required: true
         content:
@@ -110,12 +98,6 @@ paths:
       summary: Soft deletes doctor
       security:
         - BearerAuth: []
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
       responses:
         '200':
           description: Successfully deleted doctor

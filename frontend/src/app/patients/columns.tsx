@@ -1,13 +1,14 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import {ColumnDef} from "@tanstack/react-table"
+import { ColumnDef } from "@tanstack/react-table"
 import { PatientInfo } from "../../../generated"
+import { format } from "date-fns"
 
 export const columns: ColumnDef<PatientInfo>[] = [
   {
     id: "select",
-    header: '',
+    header: "",
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -20,22 +21,31 @@ export const columns: ColumnDef<PatientInfo>[] = [
   },
   {
     accessorKey: "firstName",
-    header: "First Name"
+    header: "First Name",
   },
   {
     accessorKey: "lastName",
-    header: "Last Name"
+    header: "Last Name",
   },
   {
     accessorKey: "email",
-    header: "Email"
+    header: "Email",
   },
   {
     accessorKey: "contactNumber",
-    header: "Contact Number"
+    header: "Contact Number",
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created at",
+    cell: ({ row }) => {
+      const value: string = row.getValue("createdAt")
+      const date = new Date(value)
+      return format(date, "dd MMMM yyyy") // e.g., 21 April 2025
+    },
   },
   {
     accessorKey: "total_treatments",
-    header: "Total treatments"
-  }
+    header: "Total treatments",
+  },
 ]
