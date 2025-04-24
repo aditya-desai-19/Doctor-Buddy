@@ -7,6 +7,8 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
+import AlertDialogComponent from "@/components/AlertDialogComponent"
+import { Button } from "@/components/ui/button"
 import {
   Table,
   TableBody,
@@ -15,43 +17,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import React, { useCallback, useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import AlertDialogComponent from "@/components/AlertDialogComponent"
 import { useTranslations } from "next-intl"
-import { useMutation } from "@tanstack/react-query"
-import { deletePatient, searchPatient } from "@/api/action"
-import { toastError, toastSuccess } from "@/components/Toast"
-import { usePatientStore } from "@/zustand/usePatient"
-import { PatientInfo } from "../../../generated"
-import { Input } from "@/components/ui/input"
-import { FullPageSpinner } from "@/components/LoadingSpinner"
-import {debounce} from "lodash"
+import { useEffect, useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  onCreate: () => void | undefined
+  onEdit: (id: string) => void
+  onDelete: (id: string) => void
 }
 
 export default function DataTable<TData, TValue>({
   columns,
   data,
+  onCreate,
+  onEdit,
+  onDelete,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
-  const [isSearching, setIsSearching] = useState<boolean>()
-  const { patients, setPatients, removePatient } = usePatientStore(
-    (state) => state
-  )
-  const t = useTranslations()
-  const router = useRouter()
 
-  const mutation = useMutation({
-    mutationFn: deletePatient,
-  })
+  const t = useTranslations()
 
   const table = useReactTable({
-    data: patients as unknown as TData[],
+    data: data,
     columns,
     getCoreRowModel: getCoreRowModel(),
     onRowSelectionChange: setRowSelection,
@@ -61,50 +50,15 @@ export default function DataTable<TData, TValue>({
   })
   const selectedRow = table.getSelectedRowModel().rows[0]?.original
 
-  const onEdit = useCallback(() => {
-    if (selectedRow) {
-      //@ts-ignore
-      router.push(`/patients/${selectedRow.id}`)
-    }
-  }, [selectedRow])
-
-  const onDelete = useCallback(() => {
-    if (selectedRow) {
-      //@ts-ignore
-      removePatient(selectedRow.id)
-      //@ts-ignore
-      mutation.mutate(selectedRow.id!, {
-        onSuccess: () => {
-          toastSuccess(t("DeleteSuccessMsg"))
-        },
-        onError: () => {
-          toastError(t("SomeErrorOccured"))
-        },
-      })
-    }
-  }, [selectedRow])
-
-  const onSearchTextChange = useCallback(debounce(async (e: any) => {
-    setIsSearching(true)
-    const filteredData = await searchPatient(e.target.value)
-    filteredData
-      ? setPatients(filteredData.data as unknown as PatientInfo[])
-      : toastError(t("SomeErrorOccured"))
-    setIsSearching(false)
-  }, 300), [])
-
   useEffect(() => {
-    setPatients(data as unknown as PatientInfo[])
-  }, [])
+    if (selectedRow) {
+      //@ts-ignore
+      setSelectedPatient(selectedRow.id)
+    }
+  }, [selectedRow])
 
   return (
     <div>
-      {isSearching && <FullPageSpinner />}
-      <Input
-        placeholder="Search..."
-        className="w-1/4 my-2"
-        onChange={onSearchTextChange}
-      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -156,27 +110,43 @@ export default function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex">
-        <Button
-          className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white"
-          onClick={() => router.push("/patients/create")}
-        >
-          {t("Create")}
-        </Button>
+        {onCreate && (
+          <Button
+            className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            onClick={onCreate}
+          >
+            {t("Create")}
+          </Button>
+        )}
         <Button
           className="m-2 bg-sky-600 hover:bg-sky-700 text-white"
           disabled={
-            selectedRow && Object.keys(selectedRow).length > 0 ? false : true
+            selectedRow &&
+            Object.keys(selectedRow).length > 0 &&
+            table.getSelectedRowModel().rows.length === 1
+              ? false
+              : true
           }
-          onClick={onEdit}
+          onClick={() => {
+            //@ts-ignore
+            onEdit(selectedRow.id)
+          }}
         >
           {t("Edit")}
         </Button>
         <AlertDialogComponent
           dialogButtonText={t("Delete")}
           dialogButtonClassName="m-2 bg-rose-600 hover:bg-rose-700 text-white w-16 p-1 rounded-md text-sm"
-          onDelete={onDelete}
+          onDelete={() => {
+            //@ts-ignore
+            onDelete(selectedRow.id)
+          }}
           dialogButtonDisabled={
-            selectedRow && Object.keys(selectedRow).length > 0 ? false : true
+            selectedRow &&
+            Object.keys(selectedRow).length > 0 &&
+            table.getSelectedRowModel().rows.length === 1
+              ? false
+              : true
           }
           alertTitle={t("DeleteDialogTitle")}
           dialogActionClassName="bg-rose-600 hover:bg-rose-700 text-white"
