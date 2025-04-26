@@ -23,9 +23,9 @@ import { useState } from "react"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
-  onCreate: () => void | undefined
   onEdit: (id: string) => void
   onDelete: (id: string) => void
+  onCreate?: () => void | undefined
 }
 
 export default function DataTable<TData, TValue>({

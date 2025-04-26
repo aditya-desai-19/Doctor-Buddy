@@ -1,7 +1,7 @@
 "use server"
 
 import { ACCESS_TOKEN_KEY } from "@/common/constants"
-import { TreatmentRequest, UpdatePatientWithIdRequest, UpdateTreatmentWithIdRequest } from "@/common/types"
+import { CommonRequestQueryParms, PaymentRequest, UpdatePatientWithIdRequest, UpdateTreatmentWithIdRequest } from "@/common/types"
 import { cookies } from "next/headers"
 import {
   ApiPatientPost201Response,
@@ -11,8 +11,10 @@ import {
   DoctorInfoResponse,
   LoginDoctorRequest,
   PaginatedPatientResponse,
+  PaginatedPaymentResponse,
   PaginatedTreatmentResponse,
   PatientInfo,
+  Payment,
   Summary,
   Treatment,
   TreatmentInfo,
@@ -251,7 +253,7 @@ export const updateTreatment = async (data: UpdateTreatmentWithIdRequest)=> {
   throw new Error("Failed to get api client")
 }
 
-export const getTreatments = async (q: TreatmentRequest): Promise<PaginatedTreatmentResponse> => {
+export const getTreatments = async (q: CommonRequestQueryParms): Promise<PaginatedTreatmentResponse> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiTreatmentGet(q.page, q.limit, q.search)
@@ -266,6 +268,41 @@ export const deletTreatmentById = async (id: string) => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiTreatmentIdDelete(id)
+    if (response.status === 200) {
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+//payment
+export const createPayment = async (data: Payment) => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPaymentPost(data)
+    if (response.status === 200) {
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+//payments
+export const getPayments = async (query: PaymentRequest): Promise<PaginatedPaymentResponse> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPaymentGet(query.page, query.limit, query.treatmentId, query.search)
+    if (response.status === 200) {
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+export const deletePayment = async (id: string) => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPaymentIdDelete(id)
     if (response.status === 200) {
       return response.data
     }

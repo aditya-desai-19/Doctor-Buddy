@@ -29,12 +29,14 @@ import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { UpdateTreatmentWithIdRequest } from "@/common/types"
+import { usePaymentStore } from "@/zustand/usePaymentStore"
 
 export default function EditTreatmentPage() {
   const t = useTranslations()
   const pathname = usePathname()
   const id = pathname.substring(pathname.indexOf("s/") + 2)
   const router = useRouter()
+  const setTreatmentId = usePaymentStore(state => state.setTreatmentId)
   
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -76,9 +78,14 @@ export default function EditTreatmentPage() {
     router.push("/treatments")
   }, [])
 
-  const onSelect = (id: string) => {
+  const onSelect = useCallback((id: string) => {
     form.setValue("patientId", id)
-  }
+  }, [])
+
+  const onCreate = useCallback(() => {
+    setTreatmentId(id)
+    router.push("/payments/create")
+  }, [id])
 
   useEffect(() => {
     if (data) {
@@ -180,6 +187,24 @@ export default function EditTreatmentPage() {
                 </div>
               </form>
             </Form>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <Accordion
+        type="single"
+        collapsible
+        className="my-6 text-lg text-blue-900 border-b"
+      >
+        <AccordionItem value="item-1">
+          <AccordionTrigger>{t("PaymentDetails")}</AccordionTrigger>
+          <AccordionContent>
+
+          <Button
+            className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
+            onClick={onCreate}
+          >
+            {t("Create")}
+          </Button>
           </AccordionContent>
         </AccordionItem>
       </Accordion>

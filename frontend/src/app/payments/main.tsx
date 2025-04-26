@@ -1,26 +1,25 @@
 "use client"
 
-import { deletePatient, searchPatient } from "@/api/action"
 import DataTable from "@/components/Datatable"
-import { toastError, toastSuccess } from "@/components/Toast"
-import { usePatientStore } from "@/zustand/usePatientStore"
-import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import { PaginatedPatientResponse, PatientInfo } from "../../../generated"
+import { PaginatedPaymentResponse, PaymentInfo } from "../../../generated"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { debounce } from "lodash"
 import { Input } from "@/components/ui/input"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import { useMutation } from "@tanstack/react-query"
+import { deletePayment } from "@/api/action"
+import { toastError, toastSuccess } from "@/components/Toast"
 
 type Props = {
-  data: PaginatedPatientResponse | null
+  data: PaginatedPaymentResponse | null
 }
 
-export const columns: ColumnDef<PatientInfo>[] = [
+export const columns: ColumnDef<PaymentInfo>[] = [
   {
     id: "select",
     header: "",
@@ -59,30 +58,28 @@ export const columns: ColumnDef<PatientInfo>[] = [
 
 export default function PatientListView({ data }: Props) {
   const [isSearching, setIsSearching] = useState<boolean>(false)
+  const [payments, setPayments] = useState<PaymentInfo[]>([])
 
   const t = useTranslations()
   const router = useRouter()
 
-  //todo
-  // const mutation = useMutation({
-  //   mutationFn: deletePatient,
-  // })
+  const mutation = useMutation({
+    mutationFn: deletePayment,
+  })
 
   const onEdit = useCallback((id: string) => {
     router.push(`/payments/${id}`)
   }, [])
 
   const onDelete = useCallback((id: string) => {
-    // removePatient(id)
-    // //@ts-ignore
-    // mutation.mutate(selectedRow.id!, {
-    //   onSuccess: () => {
-    //     toastSuccess(t("DeleteSuccessMsg"))
-    //   },
-    //   onError: () => {
-    //     toastError(t("SomeErrorOccured"))
-    //   },
-    // })
+    mutation.mutate(id, {
+      onSuccess: () => {
+        toastSuccess(t("DeletePaymentSuccessMsg"))
+      },
+      onError: () => {
+        toastError(t("SomeErrorOccured"))
+      },
+    })
   }, [])
 
   const onSearchTextChange = useCallback(
@@ -98,9 +95,9 @@ export default function PatientListView({ data }: Props) {
     []
   )
 
-  // useEffect(() => {
-  //   setPatients(data?.data || [])
-  // }, [data?.data])
+  useEffect(() => {
+    setPayments(data?.data || [])
+  }, [data?.data])
 
   return (
     <div>
@@ -111,7 +108,7 @@ export default function PatientListView({ data }: Props) {
         onChange={onSearchTextChange}
       />
       <DataTable
-        data={data}
+        data={payments}
         columns={columns}
         onEdit={onEdit}
         onDelete={onDelete}

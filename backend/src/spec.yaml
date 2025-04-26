@@ -373,19 +373,21 @@ paths:
         - name: page
           in: query
           description: Page number
-          required: true
           schema:
             type: integer
         - name: limit
           in: query
           description: Maximum number of items to return
-          required: true
           schema:
             type: integer
         - name: treatmentId
           in: query
-          description: Patient id
-          required: true
+          description: Treatment id
+          schema:
+            type: string
+        - name: search
+          in: query
+          description: Search
           schema:
             type: string
       responses:
@@ -623,6 +625,8 @@ components:
           type: string
         patientId: 
           type: string
+        patientName: 
+          type: string
         description: 
           type: string
         cost: 
@@ -707,29 +711,21 @@ components:
       required:
         - id
         - amount
-        - isDeleted
-        - treatmentId
+        - treatmentName
+        - patientName
         - createdAt
-        - updatedAt
       properties:
         id:
           type: string
         amount:
           type: integer
-        isDeleted:
-          type: boolean
-        treatmentId:
+        treatmentName:
+          type: string
+        patientName:
           type: string
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        deletedAt:
-          type: string
-          format: date-time
-          nullable: true
     
     PaginatedPaymentResponse:
       type: object

@@ -44,12 +44,28 @@ export const getTreatment = async (id: string) => {
         id,
         isDeleted: false,
         patient: {
+          
           isDeleted: false,
           doctor: {
             isDeleted: false,
           },
+          
         },
       },
+      select: {
+        id: true,
+        name: true,
+        cost: true,
+        description: true,
+        createdAt: true,
+        patientId: true,
+        patient: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
     })
 
     return treatment
@@ -105,7 +121,8 @@ export const getTreatmentById = async (req: CustomRequest, res: Response) => {
       name: treatment.name,
       description: treatment.description || undefined,
       cost: treatment.cost,
-      patientId: treatment.patientId
+      patientId: treatment.patientId,
+      patientName: `${treatment.patient.firstName} ${treatment.patient.lastName}`
     }
 
     res.status(200).json(formattedResponse)
@@ -241,7 +258,6 @@ export const getPaginatedTreatments = async (
   WHERE t."isDeleted" = false AND p."isDeleted" = false
 `
     if (query.search !== "undefined") {
-      console.log("inside search", query.search)
       params.push(`%${query.search}%`)
       params.push(`%${query.search}%`)
       params.push(`%${query.search}%`)

@@ -1,11 +1,11 @@
 import express from "express"
 import { verifyToken } from "../middlewares/verifyAccessToken.middleware"
-import { createPayment, deletePayment, getPaginatedPayments, getPaymentById, updatePayment } from "../controllers/payment.controller"
+import { createPayment, deletePayment, getPaymentsByTreatmentId, getPaymentById, updatePayment } from "../controllers/payment.controller"
 
 const paymentRouter = express.Router()
 
 //@ts-ignore
-paymentRouter.get("/", verifyToken(), getPaginatedPayments)
+paymentRouter.get("/", verifyToken(), getPaymentsByTreatmentId)
 //@ts-ignore
 paymentRouter.post("/", verifyToken(), createPayment)
 //@ts-ignore

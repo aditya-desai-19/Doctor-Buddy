@@ -86,10 +86,9 @@ export default function PatientListView({ data }: Props) {
 
   const onDelete = useCallback((id: string) => {
     removePatient(id)
-    //@ts-ignore
-    mutation.mutate(selectedRow.id!, {
+    mutation.mutate(id, {
       onSuccess: () => {
-        toastSuccess(t("DeleteSuccessMsg"))
+        toastSuccess(t("DeletePatientSuccessMsg"))
       },
       onError: () => {
         toastError(t("SomeErrorOccured"))

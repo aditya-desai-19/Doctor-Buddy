@@ -14,7 +14,7 @@ import { format } from "date-fns"
 import { debounce } from "lodash"
 import { Input } from "@/components/ui/input"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
-import { TreatmentRequest } from "@/common/types"
+import { CommonRequestQueryParms } from "@/common/types"
 
 type Props = {
   data: PaginatedTreatmentResponse | null
@@ -90,7 +90,7 @@ export default function PatientListView({ data }: Props) {
   const onDelete = useCallback((id: string) => {
     mutation.mutate(id!, {
       onSuccess: () => {
-        toastSuccess(t("DeleteSuccessMsg"))
+        toastSuccess(t("DeleteTreatmentSuccessMsg"))
       },
       onError: () => {
         toastError(t("SomeErrorOccured"))
@@ -101,7 +101,7 @@ export default function PatientListView({ data }: Props) {
   const onSearchTextChange = useCallback(
     debounce(async (e: any) => {
       setIsSearching(true)
-      const req: TreatmentRequest= {
+      const req: CommonRequestQueryParms= {
         search: e.target.value
       } 
       const filteredData = await getTreatments(req)

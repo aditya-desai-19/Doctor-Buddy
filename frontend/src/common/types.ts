@@ -8,8 +8,12 @@ export interface UpdateTreatmentWithIdRequest extends UpdateTreatmentRequest {
   id: string
 }
 
-export type TreatmentRequest = {
+export interface CommonRequestQueryParms {
   page?: number,
   limit?: number,
   search?: string
+}
+
+export interface PaymentRequest extends CommonRequestQueryParms {
+  treatmentId?: string
 }

@@ -30,7 +30,7 @@
   "Cancel": "Cancel",
   "Delete": "Delete",
   "DeleteDialogTitle": "Are you sure you want to delete?",
-  "DeleteSuccessMsg": "Successfully deleted patient",
+  "DeletePatientSuccessMsg": "Successfully deleted patient",
   "Edit": "Edit",
   "Create": "Create",
   "NoResults": "No results.",
@@ -50,5 +50,13 @@
   "Description": "Description",
   "TreatmentDescMsg": "Enter treatment details...",
   "EditTreatment": "Edit treatment",
-  "TreatmentSuccessMsg": "Successfully created treatment"
+  "TreatmentSuccessMsg": "Successfully created treatment",
+  "PaymentDetails": "PaymentDetails",
+  "CreatePayment": "Create Payment",
+  "Amount": "Amount",
+  "PatientName": "Patient name",
+  "PaymentSuccessMsg": "Successfully created payment",
+  "DeleteTreatmentSuccessMsg": "Successfully deleted treatment",
+  "DeletePaymentSuccessMsg": "Successfully deleted treatment",
+  "EditPayment": "Edit Payment"
 }

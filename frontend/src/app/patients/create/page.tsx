@@ -20,6 +20,7 @@ import { useCallback } from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { CreatePatientRequest } from "../../../../generated"
+import SubHeading from "@/components/SubHeading"
 
 const formSchema = z.object({
   firstName: z.string(),
@@ -39,20 +40,13 @@ export default function PatientCreate() {
   })
 
   const mutation = useMutation({
-    mutationFn: createPatient,
-    onSuccess: (data) => {
-      console.log({ data })
-    },
-    onError: () => {
-      toastError(t("SomeErrorOccured"))
-    },
+    mutationFn: createPatient
   })
 
-  const onSubmit = useCallback(async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = useCallback((values: z.infer<typeof formSchema>) => {
     const data: CreatePatientRequest = { ...values }
     mutation.mutate(data, {
       onSuccess: (res) => {
-        console.log({ res })
         toastSuccess(t("SuccessfullyCreatedPatient"))
         res && router.push(`/patients/${res.id}`)
       },
@@ -64,7 +58,7 @@ export default function PatientCreate() {
 
   return (
     <div className="mx-30 my-10">
-      <h2 className="my-6 text-xl text-blue-900">{t("CreatePatient")}</h2>
+      <SubHeading title={t("CreatePatient")}/>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
