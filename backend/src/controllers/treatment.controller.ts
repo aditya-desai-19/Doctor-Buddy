@@ -15,6 +15,9 @@ type GetTreatmentRequest =
 type PaginatedTreatmentResponse =
   paths["/api/treatment/"]["get"]["responses"]["200"]["content"]["application/json"]
 
+type TreatmentResponse =
+  paths["/api/treatment/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
+
 const checkPatientExist = async (patientId: string): Promise<boolean> => {
   try {
     await prisma.patient.findUnique({
@@ -46,7 +49,7 @@ export const getTreatment = async (id: string) => {
             isDeleted: false,
           },
         },
-      }
+      },
     })
 
     return treatment
@@ -97,7 +100,15 @@ export const getTreatmentById = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ error: "Treatment not found" })
     }
 
-    res.status(200).json(treatment)
+    const formattedResponse: TreatmentResponse = {
+      id: treatment.id,
+      name: treatment.name,
+      description: treatment.description || undefined,
+      cost: treatment.cost,
+      patientId: treatment.patientId
+    }
+
+    res.status(200).json(formattedResponse)
   } catch (err) {
     console.error("Error fetching treatment:", err)
     res.status(500).json({ error: "Internal server error" })
@@ -107,7 +118,8 @@ export const getTreatmentById = async (req: CustomRequest, res: Response) => {
 export const updateTreatment = async (req: CustomRequest, res: Response) => {
   try {
     const { id } = req.params
-    const { name, cost, description }: UpdateTreatmentRequest = req.body
+    const { name, cost, description, patientId }: UpdateTreatmentRequest =
+      req.body
 
     if (!name || !cost) {
       return res.status(400).json({ error: "Missing required fields" })
@@ -134,7 +146,8 @@ export const updateTreatment = async (req: CustomRequest, res: Response) => {
         name,
         cost,
         description,
-      }
+        patientId,
+      },
     })
 
     res.status(200).json({ message: "Treatment updated successfully" })
@@ -167,7 +180,7 @@ export const deleteTreatment = async (req: CustomRequest, res: Response) => {
       data: {
         isDeleted: true,
         deletedAt: new Date(),
-      }
+      },
     })
 
     res.status(200).json({ message: "Treatment deleted successfully" })
@@ -177,41 +190,29 @@ export const deleteTreatment = async (req: CustomRequest, res: Response) => {
   }
 }
 
+function serializeBigInt(obj: any) {
+  return JSON.parse(
+    JSON.stringify(obj, (_, value) =>
+      typeof value === "bigint" ? value.toString() : value
+    )
+  )
+}
+
 export const getPaginatedTreatments = async (
   req: CustomRequest,
   res: Response
 ) => {
   try {
-    const { page, limit, patientId } = req.query
+    const { page, limit, search } = req.query
     const query: GetTreatmentRequest = {
       page: parseInt(page as string),
       limit: parseInt(limit as string),
-      patientId: `${patientId}`,
-    }
-
-    if (!query.page || !query.limit || !query.patientId) {
-      return res.status(400).json({ error: "Missing required fields" })
+      search: `${search}`,
     }
 
     const totalCount = await prisma.treatment.count({
       where: {
-        patientId: query.patientId,
         isDeleted: false,
-        patient: {
-          isDeleted: false,
-          doctor: {
-            isDeleted: false
-          }
-        }
-      }
-    })
-
-    const result: PaginatedTreatmentResponse = {}
-
-    const data = await prisma.treatment.findMany({
-      where: {
-        isDeleted: false,
-        patientId: query.patientId,
         patient: {
           isDeleted: false,
           doctor: {
@@ -219,27 +220,85 @@ export const getPaginatedTreatments = async (
           },
         },
       },
-      skip: (query.page - 1) * query.limit,
-      take: query.limit
     })
 
-    if (query.page > 1 && query.limit < totalCount) {
-      result.previous = {
-        limit: query.limit,
-        page: query.page - 1,
+    const result: PaginatedTreatmentResponse = {}
+    const params: any[] = [req.user.doctorId]
+
+    let sql = `
+    SELECT
+    t.id, 
+    t."name",
+    p."firstName",
+    p."lastName",
+    p."contactNumber",
+    t."cost",
+    COALESCE(SUM(p2.amount), 0) AS "totalPaid",
+    t."createdAt"
+  FROM "Treatment" t
+  JOIN "Patient" p ON p.id = t."patientId"
+  LEFT JOIN "Payment" p2 ON p2."treatmentId" = t.id AND p2."isDeleted" = false
+  WHERE t."isDeleted" = false AND p."isDeleted" = false
+`
+    if (query.search !== "undefined") {
+      console.log("inside search", query.search)
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+
+      sql += `
+      AND (
+      LOWER(p."firstName") LIKE $${params.length - 3} OR
+      LOWER(p."lastName") LIKE $${params.length - 2} OR
+      LOWER(t."name") LIKE $${params.length - 1} OR
+      LOWER(p."contactNumber") LIKE $${params.length}
+      )
+      `
+    }
+
+    sql += `
+      GROUP BY 
+      t.id, 
+      t."name", 
+      p.id, 
+      p."firstName", 
+      p."lastName", 
+      p."contactNumber", 
+      t."cost", 
+      t."createdAt"
+    `
+
+    if (
+      !Number.isNaN(query.limit) &&
+      !Number.isNaN(query.page) &&
+      query.page !== undefined &&
+      query.limit !== undefined
+    ) {
+      params.push(query.limit)
+      params.push((query.page - 1) * query.limit)
+      sql += ` LIMIT $${params.length - 1} OFFSET $${params.length}`
+    }
+
+    const rawData: any[] = await prisma.$queryRawUnsafe(sql, ...params)
+
+    if (query.page !== undefined && query.limit !== undefined) {
+      if (query.page > 1 && query.limit < totalCount) {
+        result.previous = {
+          limit: query.limit,
+          page: query.page - 1,
+        }
+      }
+      const currItems = (query.page - 1) * query.limit + query.limit
+      if (currItems < totalCount) {
+        result.next = {
+          limit: query.limit,
+          page: query.page + 1,
+        }
       }
     }
 
-    const currItems = ((query.page - 1) * query.limit) + query.limit
-    if (currItems < totalCount) {
-      result.next = {
-        limit: query.limit,
-        page: query.page + 1,
-      }
-    }
-
-    //@ts-ignore
-    result.data = data
+    result.data = serializeBigInt(rawData)
     return res.status(200).json({ ...result })
   } catch (err) {
     console.error("Error fetching treatments:", err)

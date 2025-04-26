@@ -1,30 +1,10 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
 import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion"
 import { useTranslations } from "next-intl"
 import {
   Form,
@@ -34,8 +14,14 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import PatientDropDown from "../PatientDropDown"
-
+import PatientDropDown from "../../../components/PatientDropDown"
+import { Treatment } from "../../../../generated"
+import { useMutation } from "@tanstack/react-query"
+import { createTreatment } from "@/api/action"
+import { toastError, toastSuccess } from "@/components/Toast"
+import { useRouter } from "next/navigation"
+import { useCallback, useState } from "react"
+import { FullPageSpinner } from "@/components/LoadingSpinner"
 
 export const formSchema = z.object({
   patientId: z.string().min(1, "Please select a patient."),
@@ -49,37 +35,53 @@ export const formSchema = z.object({
 
 export type FormData = z.infer<typeof formSchema>
 
-
-
 export default function CreateTreatmentPage() {
-  
+  const [isCreatingTreatment, setIsCreatingTreatment] = useState<boolean>(false)
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
 
-  const selectedPatientId = form.watch("patientId")
+  const mutation = useMutation({
+    mutationFn: createTreatment,
+  })
 
   const t = useTranslations()
+  const router = useRouter()
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
+  const onSubmit = useCallback((data: FormData) => {
+    setIsCreatingTreatment(true)
+    const treatment: Treatment = {
+      name: data.treatmentName,
+      cost: data.cost,
+      description: data.description,
+      patientId: data.patientId,
+    }
+    mutation.mutate(treatment, {
+      onSuccess: (data) => {
+        toastSuccess(t("TreatmentSuccessMsg"))
+        router.push(`/treatments/${data.id}`)
+      },
+      onError: () => {
+        toastError(t("SomeErrorOccured"))
+      },
+    })
     form.reset({
       cost: Number(""),
       description: "",
       patientId: "",
       treatmentName: "",
     })
-    // Call your API here
-  }
+    setIsCreatingTreatment(false)
+  }, [])
 
-  const onSelect = (id: string) => {
+  const onSelect = useCallback((id: string) => {
     form.setValue("patientId", id)
-  }
+  }, [])
 
-  
   return (
     <div className="mx-30 my-10">
+      {isCreatingTreatment && <FullPageSpinner />}
       <h2 className="my-6 text-xl text-blue-900">{t("CreateTreatment")}</h2>
       <Form {...form}>
         <form
@@ -90,7 +92,7 @@ export default function CreateTreatmentPage() {
             <label className="block mb-2 text-sm font-medium">
               {t("SelectPatient")}
             </label>
-            <PatientDropDown onSelect={onSelect}/>
+            <PatientDropDown onSelect={onSelect} />
           </div>
 
           {/* Treatment name */}

@@ -14,9 +14,6 @@ type GetPatientRequest = paths["/api/patient/"]["get"]["parameters"]["query"]
 type PaginatedPatientResponse =
   paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]
 
-type GetFilteredPatientRequest =
-  paths["/api/patient/search"]["get"]["parameters"]["query"]
-
 const getPatient = async (id: string, doctorId: string) => {
   try {
     return await prisma.patient.findUnique({
@@ -172,79 +169,8 @@ export const getPaginatedPatients = async (
   res: Response
 ) => {
   try {
-    const { page, limit } = req.query
-    const query: GetPatientRequest = {
-      page: parseInt(page as string),
-      limit: parseInt(limit as string),
-    }
-
-    const totalCount = await prisma.patient.count({
-      where: {
-        isDeleted: false,
-        doctor: {
-          isDeleted: false,
-        },
-      },
-    })
-
-    const result: PaginatedPatientResponse = {}
-
-    const rawData: any[] = await prisma.$queryRaw`
-      SELECT 
-        p.id,
-        p."firstName" ,
-        p."lastName" ,
-        p."contactNumber",
-        p.email,
-        p."createdAt",
-        COUNT(t.id) AS total_treatments
-      FROM "Patient" p  
-      LEFT JOIN "Treatment" t 
-        ON p.id = t."patientId"
-      JOIN "Doctor" d 
-        ON p."doctorId" = d.id AND d.id = ${req.user.doctorId}
-      WHERE d."isDeleted" = false AND p."isDeleted" = false
-      GROUP BY p.id
-      LIMIT ${query.limit}
-      OFFSET ${(query.page - 1) * query.limit};
-    `
-
-    const data = rawData.map((row) => ({
-      ...row,
-      total_treatments: Number(row.total_treatments),
-    }))
-
-    if (query.page > 1 && query.limit < totalCount) {
-      result.previous = {
-        limit: query.limit,
-        page: query.page - 1,
-      }
-    }
-
-    const currItems = (query.page - 1) * query.limit + query.limit
-    if (currItems < totalCount) {
-      result.next = {
-        limit: query.limit,
-        page: query.page + 1,
-      }
-    }
-
-    //@ts-ignore
-    result.data = data
-    return res.status(200).json({ ...result })
-  } catch (error) {
-    console.error("Error fetching patient:", error)
-    return res.status(500).json({ error: "Internal server error" })
-  }
-}
-
-export const getFilteredPaginatedPatients = async (
-  req: CustomRequest,
-  res: Response
-) => {
-  try {
     const { page, limit, search } = req.query
-    const query: GetFilteredPatientRequest = {
+    const query: GetPatientRequest = {
       page: parseInt(page as string),
       limit: parseInt(limit as string),
       search: `${search}`,
@@ -260,49 +186,73 @@ export const getFilteredPaginatedPatients = async (
     })
 
     const result: PaginatedPatientResponse = {}
+    const params: any[] = [req.user.doctorId]
 
-    const rawData: any[] = await prisma.$queryRaw`
-      SELECT 
-        p.id,
-        p."firstName" ,
-        p."lastName" ,
-        p."contactNumber",
-        p.email,
-        p."createdAt",
-        COUNT(t.id) AS total_treatments
-      FROM "Patient" p  
-      LEFT JOIN "Treatment" t 
-        ON p.id = t."patientId"
-      JOIN "Doctor" d 
-        ON p."doctorId" = d.id AND d.id = ${req.user.doctorId}
-      WHERE d."isDeleted" = false AND p."isDeleted" = false AND (
-        LOWER(p."firstName") LIKE LOWER(${`%${query.search}%`}) OR
-        LOWER(p."lastName") LIKE LOWER(${`%${query.search}%`}) OR
-        LOWER(p."email") LIKE LOWER(${`%${query.search}%`}) OR
-        LOWER(p."contactNumber") LIKE LOWER(${`%${query.search}%`})
-      )
-      GROUP BY p.id
-      LIMIT ${query.limit}
-      OFFSET ${(query.page - 1) * query.limit};
-    `
+    let sql = `
+  SELECT 
+    p.id,
+    p."firstName",
+    p."lastName",
+    p."contactNumber",
+    p.email,
+    p."createdAt",
+    COUNT(t.id) AS total_treatments
+  FROM "Patient" p  
+  LEFT JOIN "Treatment" t ON p.id = t."patientId"
+  JOIN "Doctor" d ON p."doctorId" = d.id AND d.id = $1
+  WHERE d."isDeleted" = false AND p."isDeleted" = false
+`
+
+    if (query.search !== "undefined") {
+      console.log("inside search")
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+      params.push(`%${query.search}%`)
+
+      sql += `
+  AND (
+    LOWER(p."firstName") LIKE $${params.length - 3} OR
+    LOWER(p."lastName") LIKE $${params.length - 2} OR
+    LOWER(p."email") LIKE $${params.length - 1} OR
+    LOWER(p."contactNumber") LIKE $${params.length}
+  )
+`
+    }
+
+    sql += ` GROUP BY p.id`
+
+    if (
+      !Number.isNaN(query.limit) &&
+      !Number.isNaN(query.page) &&
+      query.page !== undefined &&
+      query.limit !== undefined
+    ) {
+      params.push(query.limit)
+      params.push((query.page - 1) * query.limit)
+      sql += ` LIMIT $${params.length - 1} OFFSET $${params.length}`;
+    }
+
+    const rawData: any[] = await prisma.$queryRawUnsafe(sql, ...params)
 
     const data = rawData.map((row) => ({
       ...row,
       total_treatments: Number(row.total_treatments),
     }))
 
-    if (query.page > 1 && query.limit < totalCount) {
-      result.previous = {
-        limit: query.limit,
-        page: query.page - 1,
+    if (query.page !== undefined && query.limit !== undefined) {
+      if (query.page > 1 && query.limit < totalCount) {
+        result.previous = {
+          limit: query.limit,
+          page: query.page - 1,
+        }
       }
-    }
-
-    const currItems = (query.page - 1) * query.limit + query.limit
-    if (currItems < totalCount) {
-      result.next = {
-        limit: query.limit,
-        page: query.page + 1,
+      const currItems = (query.page - 1) * query.limit + query.limit
+      if (currItems < totalCount) {
+        result.next = {
+          limit: query.limit,
+          page: query.page + 1,
+        }
       }
     }
 

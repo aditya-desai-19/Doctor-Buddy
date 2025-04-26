@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { useTranslations } from "next-intl"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -37,6 +37,7 @@ export default function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
+  console.log({data})
   const t = useTranslations()
 
   const table = useReactTable({

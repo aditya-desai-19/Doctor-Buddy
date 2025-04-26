@@ -49,5 +49,6 @@
   "TreatmentCost": "Treatment cost",
   "Description": "Description",
   "TreatmentDescMsg": "Enter treatment details...",
-  "EditTreatment": "Edit treatment"
+  "EditTreatment": "Edit treatment",
+  "TreatmentSuccessMsg": "Successfully created treatment"
 }

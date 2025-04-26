@@ -1,26 +1,26 @@
 "use client"
 
-import { deletePatient, searchPatient } from "@/api/action"
+import { deletTreatmentById, getTreatments } from "@/api/action"
 import DataTable from "@/components/Datatable"
 import { toastError, toastSuccess } from "@/components/Toast"
-import { usePatientStore } from "@/zustand/usePatientStore"
 import { useMutation } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { useCallback, useEffect, useState } from "react"
-import { PaginatedPatientResponse, PatientInfo } from "../../../generated"
+import { PaginatedTreatmentResponse, TreatmentInfo } from "../../../generated"
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { debounce } from "lodash"
 import { Input } from "@/components/ui/input"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import { TreatmentRequest } from "@/common/types"
 
 type Props = {
-  data: PaginatedPatientResponse | null
+  data: PaginatedTreatmentResponse | null
 }
 
-export const columns: ColumnDef<PatientInfo>[] = [
+export const columns: ColumnDef<TreatmentInfo>[] = [
   {
     id: "select",
     header: "",
@@ -39,8 +39,12 @@ export const columns: ColumnDef<PatientInfo>[] = [
     header: "Name",
   },
   {
-    accessorKey: "patientName",
-    header: "Patient Name",
+    accessorKey: "firstName",
+    header: "Patient's First name",
+  },
+  {
+    accessorKey: "lastName",
+    header: "Patient's last name",
   },
   {
     accessorKey: "contactNumber",
@@ -51,7 +55,7 @@ export const columns: ColumnDef<PatientInfo>[] = [
     header: "Total cost",
   },
   {
-    accessorKey: "paid",
+    accessorKey: "totalPaid",
     header: "Amount paid"
   },
   {
@@ -67,14 +71,13 @@ export const columns: ColumnDef<PatientInfo>[] = [
 
 export default function PatientListView({ data }: Props) {
   const [isSearching, setIsSearching] = useState<boolean>(false)
-
+  const [treatments, setTreatments] = useState<TreatmentInfo[]>([])
   const t = useTranslations()
   const router = useRouter()
 
-  //todo
-  // const mutation = useMutation({
-  //   mutationFn: deletePatient,
-  // })
+  const mutation = useMutation({
+    mutationFn: deletTreatmentById,
+  })
 
   const onCreate = useCallback(() => {
     router.push(`/treatments/create`)
@@ -85,34 +88,34 @@ export default function PatientListView({ data }: Props) {
   }, [])
 
   const onDelete = useCallback((id: string) => {
-    // removePatient(id)
-    // //@ts-ignore
-    // mutation.mutate(selectedRow.id!, {
-    //   onSuccess: () => {
-    //     toastSuccess(t("DeleteSuccessMsg"))
-    //   },
-    //   onError: () => {
-    //     toastError(t("SomeErrorOccured"))
-    //   },
-    // })
+    mutation.mutate(id!, {
+      onSuccess: () => {
+        toastSuccess(t("DeleteSuccessMsg"))
+      },
+      onError: () => {
+        toastError(t("SomeErrorOccured"))
+      },
+    })
   }, [])
 
   const onSearchTextChange = useCallback(
     debounce(async (e: any) => {
-      //todo
-      // setIsSearching(true)
-      // const filteredData = await searchPatient(e.target.value)
-      // filteredData
-      //   ? setPatients(filteredData.data as unknown as PatientInfo[])
-      //   : toastError(t("SomeErrorOccured"))
-      // setIsSearching(false)
+      setIsSearching(true)
+      const req: TreatmentRequest= {
+        search: e.target.value
+      } 
+      const filteredData = await getTreatments(req)
+      filteredData
+        ? setTreatments(filteredData.data as unknown as TreatmentInfo[])
+        : toastError(t("SomeErrorOccured"))
+      setIsSearching(false)
     }, 300),
     []
   )
 
-  // useEffect(() => {
-  //   setPatients(data?.data || [])
-  // }, [data?.data])
+  useEffect(() => {
+    setTreatments(data?.data || [])
+  }, [data?.data])
 
   return (
     <div>
@@ -123,7 +126,7 @@ export default function PatientListView({ data }: Props) {
         onChange={onSearchTextChange}
       />
       <DataTable
-        data={data}
+        data={treatments}
         columns={columns}
         onCreate={onCreate}
         onEdit={onEdit}

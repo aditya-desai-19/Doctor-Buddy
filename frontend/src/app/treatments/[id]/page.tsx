@@ -18,29 +18,83 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import PatientDropDown from "../PatientDropDown"
+import PatientDropDown from "../../../components/PatientDropDown"
 import { Input } from "@/components/ui/input"
 import SubHeading from "@/components/SubHeading"
+import { usePathname, useRouter } from "next/navigation"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { getTreatmentById, updateTreatment } from "@/api/action"
+import { toastError, toastSuccess } from "@/components/Toast"
+import { FullPageSpinner } from "@/components/LoadingSpinner"
+import { useCallback, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { UpdateTreatmentWithIdRequest } from "@/common/types"
 
 export default function EditTreatmentPage() {
   const t = useTranslations()
-
+  const pathname = usePathname()
+  const id = pathname.substring(pathname.indexOf("s/") + 2)
+  const router = useRouter()
+  
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
+  const mutation = useMutation({
+    mutationFn: updateTreatment,
+  })
+  
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["getTreatment"],
+    queryFn: () => getTreatmentById(id),
+  })
 
-    // Call your API here
+  if (isError) {
+    toastError(error.message)
   }
+  
+  const onSave = useCallback(() => {
+    const data = form.getValues()
+    const requestBody: UpdateTreatmentWithIdRequest = {
+      id,
+      name: data.treatmentName,
+      description: data.description,
+      cost: data.cost
+    }
+    mutation.mutate(requestBody, {
+      onSuccess: () => {
+        toastSuccess(t("SuccessfullyUpdatedPatientDetails"))
+      },
+      onError: (error) => {
+        console.error(error)
+        toastError(t("SomeErrorOccured"))
+      },
+    })
+  }, [form, pathname])
+
+  const navigateToList = useCallback(() => {
+    router.push("/treatments")
+  }, [])
 
   const onSelect = (id: string) => {
     form.setValue("patientId", id)
   }
 
+  useEffect(() => {
+    if (data) {
+      const { patientId, name, cost, description } = data
+      form.reset({
+        treatmentName: name,
+        description: description || undefined,
+        cost: cost,
+        patientId: patientId
+      })
+    }
+  }, [data])
+
   return (
     <div className="mx-30 my-10">
+      {(mutation.isPending || isPending) && <FullPageSpinner />}
       <SubHeading title={t("EditTreatment")}/>
       <Accordion
         type="single"
@@ -52,7 +106,6 @@ export default function EditTreatmentPage() {
           <AccordionContent>
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6 text-[var(--font-color)]"
               >
                 <div className="flex mx-2">
@@ -60,7 +113,7 @@ export default function EditTreatmentPage() {
                     <label className="block  text-sm font-medium">
                       {t("SelectPatient")}
                     </label>
-                    <PatientDropDown onSelect={onSelect} />
+                    <PatientDropDown onSelect={onSelect} patientId={data?.patientId}/>
                   </div>
                     <FormField
                       control={form.control}
@@ -130,6 +183,21 @@ export default function EditTreatmentPage() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
+      <div>
+        <Button
+          className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
+          onClick={onSave}
+          disabled={!form.formState.isDirty}
+        >
+          {t("Save")}
+        </Button>
+        <Button
+          className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
+          onClick={navigateToList}
+        >
+          {t("BackToList")}
+        </Button>
+      </div>
     </div>
   )
 }

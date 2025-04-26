@@ -34,8 +34,6 @@ const Tile = ({
 }
 
 export default function Home() {
-  const isLoggedIn = useLoginStore((state) => state.isLoggedIn)
-
   const { isPending, isError, data, error } = useQuery({
     queryKey: ["summary"],
     queryFn: getSummary,
@@ -43,35 +41,27 @@ export default function Home() {
 
   const t = useTranslations()
 
-  if(isError) {
+  if (isError) {
     toastError(error.message)
   }
 
   return (
-    <>
-    {isLoggedIn ? 
-      <div className="flex flex-wrap mx-20">
-        <Tile
-          title={t("TotalPatients")}
-          number={`${data?.totalPatients || 0}`}
-          isLoading={isPending}
-        />
-        <Tile
-          title={t("TotalTreatments")}
-          number={`${data?.totalTreatments || 0}`}
-          isLoading={isPending}
-        />
-        <Tile
-          title={t("TotalPayments")}
-          number={`₹ ${data?.totalPayments || 0}`}
-          isLoading={isPending}
-        />
-      </div>
-      : 
-      <div>
-        <h1>Home page</h1>
-      </div>
-    }
-    </>
+    <div className="flex flex-wrap mx-20">
+      <Tile
+        title={t("TotalPatients")}
+        number={`${data?.totalPatients || 0}`}
+        isLoading={isPending}
+      />
+      <Tile
+        title={t("TotalTreatments")}
+        number={`${data?.totalTreatments || 0}`}
+        isLoading={isPending}
+      />
+      <Tile
+        title={t("TotalPayments")}
+        number={`₹ ${data?.totalPayments || 0}`}
+        isLoading={isPending}
+      />
+    </div>
   )
 }

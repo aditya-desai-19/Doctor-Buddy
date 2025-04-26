@@ -139,15 +139,18 @@ paths:
         - name: page
           in: query
           description: Page number
-          required: true
           schema:
             type: integer
         - name: limit
           in: query
           description: Maximum number of items to return
-          required: true
           schema:
             type: integer
+        - name: search
+          in: query
+          description: Search text
+          schema:
+            type: string
       responses:
         '200':
           description: A list of patients
@@ -223,38 +226,6 @@ paths:
                   message: 
                     type: string
 
-  /api/patient/search:
-    get:
-      summary: Retrieves filtered a list of patients
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: page
-          in: query
-          description: Page number
-          required: true
-          schema:
-            type: integer
-        - name: limit
-          in: query
-          description: Maximum number of items to return
-          required: true
-          schema:
-            type: integer
-        - name: search
-          in: query
-          description: Search text
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: A list of filtered patients
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedPatientResponse'
-
   /api/treatment/:
     post:
       summary: Creates a treatment
@@ -285,19 +256,16 @@ paths:
         - name: page
           in: query
           description: Page number
-          required: true
           schema:
             type: integer
         - name: limit
           in: query
           description: Maximum number of items to return
-          required: true
           schema:
             type: integer
-        - name: patientId
+        - name: search
           in: query
-          description: Patient id
-          required: true
+          description: Search text
           schema:
             type: string
       responses:
@@ -325,7 +293,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TreatmentInfo'
+                $ref: '#/components/schemas/Treatment'
 
     put:
       summary: Updates treatment information
@@ -649,6 +617,8 @@ components:
     Treatment:
       type: object
       properties:
+        id: 
+          type: string
         name: 
           type: string
         patientId: 
@@ -667,35 +637,30 @@ components:
       required:
         - id
         - name
+        - patientFirstName
+        - patientLastName
+        - patientContactNumber
         - cost
-        - isDeleted
-        - patientId
+        - totalPaid
         - createdAt
-        - updatedAt
       properties:
         id:
           type: string
         name:
           type: string
+        patientFirstName:
+          type: string
+        patientLastName:
+          type: string
+        patientContactNumber:
+          type: string
         cost:
           type: integer
-        isDeleted:
-          type: boolean
-        patientId:
-          type: string
+        totalPaid:
+          type: integer
         createdAt:
           type: string
           format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        description:
-          type: string
-          nullable: true
-        deletedAt:
-          type: string
-          format: date-time
-          nullable: true
     
     PaginatedTreatmentResponse:
       type: object
@@ -720,6 +685,8 @@ components:
           type: string
         cost: 
           type: integer
+        patientId:
+          type: string
       required:
         - name
         - cost
