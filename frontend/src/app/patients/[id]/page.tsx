@@ -3,6 +3,7 @@
 import { getPatient, updatePatient } from "@/api/action"
 import { UpdatePatientWithIdRequest } from "@/common/types"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import SubHeading from "@/components/SubHeading"
 import { toastError, toastSuccess } from "@/components/Toast"
 import {
   Accordion,
@@ -56,7 +57,7 @@ export default function PatientEdit() {
     queryFn: () => getPatient(id),
   })
 
-  if(isError) {
+  if (isError) {
     toastError(error.message)
   }
 
@@ -82,119 +83,134 @@ export default function PatientEdit() {
   }, [])
 
   useEffect(() => {
-    if(data) {
-      const {firstName, lastName, email, contactNumber} = data
+    if (data) {
+      const { firstName, lastName, email, contactNumber } = data
       const values: any = {
         firstName,
         lastName,
         email,
-        contactNumber
+        contactNumber,
       }
       form.reset(values)
     }
   }, [data])
 
-  console.log({dirty: form.formState.isDirty})
   return (
-    <div className="h-full">
+    <div className="mx-30 my-10">
       {(mutation.isPending || isPending) && <FullPageSpinner />}
-      <div className="mx-30 my-10">
-        <h2 className="my-6 text-xl text-blue-900">{t("EditPatient")}</h2>
-        <Accordion
-          type="single"
-          collapsible
-          className="my-6 text-lg text-blue-900 border-b"
+      <SubHeading title={t("EditPatient")} />
+      <Accordion
+        type="single"
+        collapsible
+        className="my-6 text-lg text-blue-900 border-b"
+      >
+        <AccordionItem value="item-1">
+          <AccordionTrigger>{t("PersonalInformation")}</AccordionTrigger>
+          <AccordionContent>
+            <Form {...form}>
+              <form className="space-y-6 text-[var(--font-color)]">
+              <div className="flex mx-2">
+                <FormField
+                  control={form.control}
+                  name={"firstName"}
+                  render={({ field }) => {
+                    return (
+                      <FormItem className="w-full m-2">
+                        <FormLabel>{t("FirstName")}</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder={"John"}
+                            {...field}
+                            type={"text"}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                />
+                <FormField
+                  control={form.control}
+                  name={"lastName"}
+                  render={({ field }) => (
+                    <FormItem className="w-full m-2">
+                      <FormLabel>{t("LastName")}</FormLabel>
+                      <FormControl>
+                        <Input placeholder={"Doe"} {...field} type={"text"} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                </div>
+                <div className="flex mx-2">
+                <FormField
+                  control={form.control}
+                  name={"email"}
+                  render={({ field }) => (
+                    <FormItem className="w-full m-2">
+                      <FormLabel>{t("Email")}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={"john@gmail.com"}
+                          {...field}
+                          type={"text"}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name={"contactNumber"}
+                  render={({ field }) => (
+                    <FormItem className="w-full m-2">
+                      <FormLabel>{t("ContactNumber")}</FormLabel>
+                      <FormControl>
+                        <Input {...field} type={"text"} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                </div>
+              </form>
+            </Form>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <Accordion
+        type="single"
+        collapsible
+        className="my-6 text-lg text-blue-900 border-b"
+      >
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Treatments </AccordionTrigger>
+          <AccordionContent>
+            <Button
+              className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
+              onClick={() => router.push("/treatment/create")}
+            >
+              Create treatment
+            </Button>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
+      <div>
+        <Button
+          className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
+          onClick={onSave}
+          disabled={!form.formState.isDirty}
         >
-          <AccordionItem value="item-1">
-            <AccordionTrigger>{t("PersonalInformation")}</AccordionTrigger>
-            <AccordionContent>
-              <Form {...form}>
-                <form className="h-full text-[var(--font-color)]">
-                  <div className="h-full flex flex-col items-center">
-                    <div className="flex">
-                      <FormField
-                        control={form.control}
-                        name={"firstName"}
-                        render={({ field }) => {
-                          return (
-                            <FormItem className="m-10">
-                              <FormLabel>{t("FirstName")}</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder={"John"}
-                                  {...field}
-                                  type={"text"}
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )
-                        }}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={"lastName"}
-                        render={({ field }) => (
-                          <FormItem className="m-10">
-                            <FormLabel>{t("LastName")}</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder={"Doe"}
-                                {...field}
-                                type={"text"}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="flex">
-                      <FormField
-                        control={form.control}
-                        name={"email"}
-                        render={({ field }) => (
-                          <FormItem className="m-10">
-                            <FormLabel>{t("Email")}</FormLabel>
-                            <FormControl>
-                              <Input
-                                placeholder={"john@gmail.com"}
-                                {...field}
-                                type={"text"}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name={"contactNumber"}
-                        render={({ field }) => (
-                          <FormItem className="m-10">
-                            <FormLabel>{t("ContactNumber")}</FormLabel>
-                            <FormControl>
-                              <Input {...field} type={"text"} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  </div>
-                </form>
-              </Form>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <div>
-        <Button className="my-6 mx-2 bg-blue-500 hover:bg-blue-600" onClick={onSave} disabled={!form.formState.isDirty}>
           {t("Save")}
         </Button>
-        <Button className="my-6 mx-2 bg-blue-500 hover:bg-blue-600" onClick={navigateToList}>
+        <Button
+          className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
+          onClick={navigateToList}
+        >
           {t("BackToList")}
         </Button>
-        </div>
       </div>
     </div>
   )

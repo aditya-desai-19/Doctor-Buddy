@@ -38,5 +38,16 @@
   "Profile": "Profile",
   "Logout": "Log out",
   "Hello": "Hello",
-  "EmailAddress": "Email Address"
+  "EmailAddress": "Email Address",
+  "CreateTreatment": "Create Treatment",
+  "TreatmentDetails": "Treatment Details",
+  "SelectPatient": "Select Patient",
+  "SelectPatients": "Select patients...",
+  "SearchPatients": "Search patients...",
+  "NoPatients": "No patients found",
+  "TreatmentName": "Treatment name",
+  "TreatmentCost": "Treatment cost",
+  "Description": "Description",
+  "TreatmentDescMsg": "Enter treatment details...",
+  "EditTreatment": "Edit treatment"
 }

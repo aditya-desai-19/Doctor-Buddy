@@ -50,13 +50,6 @@ export default function DataTable<TData, TValue>({
   })
   const selectedRow = table.getSelectedRowModel().rows[0]?.original
 
-  useEffect(() => {
-    if (selectedRow) {
-      //@ts-ignore
-      setSelectedPatient(selectedRow.id)
-    }
-  }, [selectedRow])
-
   return (
     <div>
       <div className="rounded-md border">
@@ -112,14 +105,14 @@ export default function DataTable<TData, TValue>({
       <div className="flex">
         {onCreate && (
           <Button
-            className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white"
+            className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
             onClick={onCreate}
           >
             {t("Create")}
           </Button>
         )}
         <Button
-          className="m-2 bg-sky-600 hover:bg-sky-700 text-white"
+          className="m-2 bg-sky-600 hover:bg-sky-700 text-white cursor-pointer"
           disabled={
             selectedRow &&
             Object.keys(selectedRow).length > 0 &&
@@ -136,7 +129,7 @@ export default function DataTable<TData, TValue>({
         </Button>
         <AlertDialogComponent
           dialogButtonText={t("Delete")}
-          dialogButtonClassName="m-2 bg-rose-600 hover:bg-rose-700 text-white w-16 p-1 rounded-md text-sm"
+          dialogButtonClassName="m-2 bg-rose-600 hover:bg-rose-700 text-white w-16 p-1 rounded-md text-sm cursor-pointer"
           onDelete={() => {
             //@ts-ignore
             onDelete(selectedRow.id)
