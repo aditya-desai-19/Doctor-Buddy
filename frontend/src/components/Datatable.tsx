@@ -37,7 +37,6 @@ export default function DataTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({})
 
-  console.log({data})
   const t = useTranslations()
 
   const table = useReactTable({

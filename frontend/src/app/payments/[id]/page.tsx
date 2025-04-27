@@ -54,7 +54,6 @@ export default function PaymentEditPage() {
     }
     mutation.mutate(body, {
       onSuccess: (data) => {
-        console.log({data})
         toastSuccess(t("EditPaymentSuccessMsg"))
         form.reset({ amount: data.amount });
       },

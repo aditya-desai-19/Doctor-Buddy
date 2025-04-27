@@ -213,7 +213,6 @@ export const getPaginatedPatients = async (
 `
 
     if (query.search !== "undefined") {
-      console.log("inside search")
       params.push(`%${query.search}%`)
       params.push(`%${query.search}%`)
       params.push(`%${query.search}%`)
