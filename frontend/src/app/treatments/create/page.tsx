@@ -26,7 +26,7 @@ import { FullPageSpinner } from "@/components/LoadingSpinner"
 export const formSchema = z.object({
   patientId: z.string().min(1, "Please select a patient."),
   treatmentName: z.string().min(1, "Treatment name is required."),
-  description: z.string().min(1, "Description is required."),
+  description: z.string().optional(),
   cost: z
     .number({ invalid_type_error: "Cost must be a number" })
     .int("Cost must be an integer")
@@ -36,8 +36,6 @@ export const formSchema = z.object({
 export type FormData = z.infer<typeof formSchema>
 
 export default function CreateTreatmentPage() {
-  const [isCreatingTreatment, setIsCreatingTreatment] = useState<boolean>(false)
-
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
@@ -50,7 +48,6 @@ export default function CreateTreatmentPage() {
   const router = useRouter()
 
   const onSubmit = useCallback((data: FormData) => {
-    setIsCreatingTreatment(true)
     const treatment: Treatment = {
       name: data.treatmentName,
       cost: data.cost,
@@ -72,7 +69,6 @@ export default function CreateTreatmentPage() {
       patientId: "",
       treatmentName: "",
     })
-    setIsCreatingTreatment(false)
   }, [])
 
   const onSelect = useCallback((id: string) => {
@@ -81,7 +77,7 @@ export default function CreateTreatmentPage() {
 
   return (
     <div className="mx-30 my-10">
-      {isCreatingTreatment && <FullPageSpinner />}
+      {mutation.isPending && <FullPageSpinner />}
       <h2 className="my-6 text-xl text-blue-900">{t("CreateTreatment")}</h2>
       <Form {...form}>
         <form

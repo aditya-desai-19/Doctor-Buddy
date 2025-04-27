@@ -181,23 +181,6 @@ export default function PatientEdit() {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-      <Accordion
-        type="single"
-        collapsible
-        className="my-6 text-lg text-blue-900 border-b"
-      >
-        <AccordionItem value="item-1">
-          <AccordionTrigger>Treatments </AccordionTrigger>
-          <AccordionContent>
-            <Button
-              className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
-              onClick={() => router.push("/treatment/create")}
-            >
-              Create treatment
-            </Button>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
       <div>
         <Button
           className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"

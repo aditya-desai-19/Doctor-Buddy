@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl"
 import { useLoginStore } from "@/zustand/useLoginStore"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
 import { useDoctorStore } from "@/zustand/useDoctorStore"
 import { getDoctorDetails, handleLogout as logout } from "@/api/action"
 import {
@@ -16,7 +16,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger
 } from "./ui/dropdown-menu"
-import { FullPageSpinner } from "./LoadingSpinner"
 
 type Props = {
   isCookieExist: boolean
@@ -27,7 +26,6 @@ export default function Header({ isCookieExist }: Props) {
   const { initials, setDoctorDetails, setInitials } = useDoctorStore(
     (state) => state
   )
-  const [isLoggingOut, setIsLoggingOut] = useState<boolean>(false)
 
   const t = useTranslations()
   const router = useRouter()
@@ -38,10 +36,9 @@ export default function Header({ isCookieExist }: Props) {
 
   const handleLogout = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    setIsLoggingOut(true)
     setIsLoggedIn(false)
     logout()
-    setIsLoggingOut(false)
+    router.push("/")
   }, [])
 
   useEffect(() => {
@@ -65,7 +62,6 @@ export default function Header({ isCookieExist }: Props) {
 
   return (
     <nav className="w-full px-6 py-4 shadow-md">
-      {isLoggingOut && <FullPageSpinner />}
       <div className="flex justify-between items-center mx-20">
         <div>
           <Link href="/" className="text-2xl font-semibold text-blue-900">

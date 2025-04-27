@@ -12,9 +12,11 @@ type GetPaymentRequest = paths["/api/payment/"]["get"]["parameters"]["query"]
 type PaginatedPaymentResponse =
   paths["/api/payment/"]["get"]["responses"]["200"]["content"]["application/json"]
 
-type Payment = paths["/api/payment/"]["get"]["responses"]["200"]["content"]["application/json"]["data"]
+type Payment =
+  paths["/api/payment/"]["get"]["responses"]["200"]["content"]["application/json"]["data"]
 
-type PaymentInfo = paths["/api/payment/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
+type PaymentInfo =
+  paths["/api/payment/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
 
 export const createPayment = async (req: CustomRequest, res: Response) => {
   try {
@@ -72,12 +74,12 @@ export const getPaymentById = async (req: CustomRequest, res: Response) => {
             patient: {
               select: {
                 firstName: true,
-                lastName: true
-              }
-            }
-          }
-        }
-      }
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     if (!result) {
@@ -85,10 +87,10 @@ export const getPaymentById = async (req: CustomRequest, res: Response) => {
     }
 
     const formattedResult: PaymentInfo = {
-      id: result?.id ,
+      id: result?.id,
       amount: result?.amount,
       treatmentName: result.treatment.name,
-      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`
+      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`,
     }
 
     return res.status(200).json({ ...formattedResult })
@@ -127,24 +129,22 @@ export const updatePayment = async (req: CustomRequest, res: Response) => {
             patient: {
               select: {
                 firstName: true,
-                lastName: true
-              }
-            }
-          }
-        }
-      }
+                lastName: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     const formattedResult: PaymentInfo = {
-      id: result?.id ,
+      id: result?.id,
       amount: result?.amount,
       treatmentName: result.treatment.name,
-      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`
+      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`,
     }
 
-    return res
-      .status(200)
-      .json(formattedResult)
+    return res.status(200).json(formattedResult)
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: "Failed to update payment" })
@@ -187,11 +187,12 @@ export const getPaymentsByTreatmentId = async (
   res: Response
 ) => {
   try {
-    const { page, limit, treatmentId } = req.query
+    const { page, limit, treatmentId, search } = req.query
     const query: GetPaymentRequest = {
       page: parseInt(page as string),
       limit: parseInt(limit as string),
       treatmentId: `${treatmentId}`,
+      search: `${search}`,
     }
 
     const totalCount = await prisma.payment.count({
@@ -218,14 +219,37 @@ export const getPaymentsByTreatmentId = async (
     FROM "Payment" p 
     JOIN "Treatment" t on p."treatmentId" = t.id and t."isDeleted" = false
     JOIN "Patient" p2 on t."patientId" = p2.id and p2."isDeleted" = false
+    JOIN "Doctor" d ON p2."doctorId" = d.id AND d."isDeleted" = false
     `
 
-    if (query.treatmentId !== "undefined") {
-      params.push(query.treatmentId)
+    if (req.user.doctorId) {
+      params.push(req.user.doctorId)
+      sql += `AND d.id = $${params.length}`
+    }
 
+    sql += `
+      WHERE 1=1 AND p."isDeleted" = false
+    `
+
+    if (query.search !== 'undefined' && query.search) {
+      params.push(`%${query.search.toLowerCase()}%`);
+      params.push(`%${query.search.toLowerCase()}%`);
+      params.push(`%${query.search.toLowerCase()}%`);
+    
       sql += `
-        WHERE t.id = $${params.length}
-      `
+        AND (
+          LOWER(t."name") LIKE $${params.length - 2}
+          OR LOWER(p2."firstName") LIKE $${params.length - 1}
+          OR LOWER(p2."lastName") LIKE $${params.length}
+        )
+      `;
+    }
+    
+    if (query.treatmentId !== 'undefined' && query.treatmentId) {
+      params.push(query.treatmentId);
+      sql += `
+        AND t.id = $${params.length}
+      `;
     }
 
     if (
@@ -240,12 +264,12 @@ export const getPaymentsByTreatmentId = async (
     }
 
     const rawData: any[] = await prisma.$queryRawUnsafe(sql, ...params)
-    const data: Payment = rawData.map(row => ({
+    const data: Payment = rawData.map((row) => ({
       id: row.id,
       amount: row.amount,
       treatmentName: row.name,
       patientName: `${row.firstName} ${row.lastName}`,
-      createdAt: row.createdAt
+      createdAt: row.createdAt,
     }))
 
     if (query.page !== undefined && query.limit !== undefined) {

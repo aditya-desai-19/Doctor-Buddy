@@ -24,7 +24,6 @@ import {
   PaymentInfo,
   Summary,
   Treatment,
-  TreatmentInfo,
   UpdateDoctorInfoRequest,
   UpdateTreatmentRequest,
 } from "../../generated"
@@ -103,7 +102,7 @@ export const getPatients =
     try {
       const clientInstance = await getApiClientWithToken()
       if (clientInstance) {
-        const result = await clientInstance.apiPatientGet(1, 10)
+        const result = await clientInstance.apiPatientGet()
         if (result.status === 200) {
           return result.data
         }

@@ -44,12 +44,10 @@ export const getTreatment = async (id: string) => {
         id,
         isDeleted: false,
         patient: {
-          
           isDeleted: false,
           doctor: {
             isDeleted: false,
           },
-          
         },
       },
       select: {
@@ -62,10 +60,10 @@ export const getTreatment = async (id: string) => {
         patient: {
           select: {
             firstName: true,
-            lastName: true
-          }
-        }
-      }
+            lastName: true,
+          },
+        },
+      },
     })
 
     return treatment
@@ -122,7 +120,7 @@ export const getTreatmentById = async (req: CustomRequest, res: Response) => {
       description: treatment.description || undefined,
       cost: treatment.cost,
       patientId: treatment.patientId,
-      patientName: `${treatment.patient.firstName} ${treatment.patient.lastName}`
+      patientName: `${treatment.patient.firstName} ${treatment.patient.lastName}`,
     }
 
     res.status(200).json(formattedResponse)
@@ -252,11 +250,20 @@ export const getPaginatedTreatments = async (
     t."cost",
     COALESCE(SUM(p2.amount), 0) AS "totalPaid",
     t."createdAt"
-  FROM "Treatment" t
-  JOIN "Patient" p ON p.id = t."patientId"
-  LEFT JOIN "Payment" p2 ON p2."treatmentId" = t.id AND p2."isDeleted" = false
-  WHERE t."isDeleted" = false AND p."isDeleted" = false
-`
+    FROM "Treatment" t
+    JOIN "Patient" p ON p.id = t."patientId"
+    JOIN "Doctor" d ON p."doctorId" = d.id AND d."isDeleted" = false `
+
+    if (req.user.doctorId) {
+      params.push(req.user.doctorId)
+      sql += `AND d.id = $${params.length}`
+    }
+
+    sql += `
+    LEFT JOIN "Payment" p2 ON p2."treatmentId" = t.id AND p2."isDeleted" = false
+    WHERE t."isDeleted" = false AND p."isDeleted" = false
+    `
+
     if (query.search !== "undefined") {
       params.push(`%${query.search}%`)
       params.push(`%${query.search}%`)

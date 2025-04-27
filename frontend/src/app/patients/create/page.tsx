@@ -21,6 +21,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { CreatePatientRequest } from "../../../../generated"
 import SubHeading from "@/components/SubHeading"
+import { FullPageSpinner } from "@/components/LoadingSpinner"
 
 const formSchema = z.object({
   firstName: z.string(),
@@ -58,6 +59,7 @@ export default function PatientCreate() {
 
   return (
     <div className="mx-30 my-10">
+      {mutation.isPending && <FullPageSpinner />}
       <SubHeading title={t("CreatePatient")}/>
       <Form {...form}>
         <form

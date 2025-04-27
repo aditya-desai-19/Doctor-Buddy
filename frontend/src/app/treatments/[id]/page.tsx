@@ -30,6 +30,7 @@ import { useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { UpdateTreatmentWithIdRequest } from "@/common/types"
 import { usePaymentStore } from "@/zustand/usePaymentStore"
+import PaymentListView from "@/app/payments/page"
 
 export default function EditTreatmentPage() {
   const t = useTranslations()
@@ -198,13 +199,7 @@ export default function EditTreatmentPage() {
         <AccordionItem value="item-1">
           <AccordionTrigger>{t("PaymentDetails")}</AccordionTrigger>
           <AccordionContent>
-
-          <Button
-            className="m-2 bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer"
-            onClick={onCreate}
-          >
-            {t("Create")}
-          </Button>
+            <PaymentListView treatmentId={id} showSearch={false} onCreate={onCreate}/>
           </AccordionContent>
         </AccordionItem>
       </Accordion>

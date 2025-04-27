@@ -207,7 +207,7 @@ export const getPaginatedPatients = async (
     p."createdAt",
     COUNT(t.id) AS total_treatments
   FROM "Patient" p  
-  LEFT JOIN "Treatment" t ON p.id = t."patientId"
+  LEFT JOIN "Treatment" t ON p.id = t."patientId" and t."isDeleted" = false
   JOIN "Doctor" d ON p."doctorId" = d.id AND d.id = $1
   WHERE d."isDeleted" = false AND p."isDeleted" = false
 `

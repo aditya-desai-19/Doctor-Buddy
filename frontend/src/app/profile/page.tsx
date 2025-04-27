@@ -27,7 +27,8 @@ export default function Profile() {
       mutation.mutate(doctorInfo as UpdateDoctorInfoRequest, {
         onSuccess: (data) => {
           toastSuccess(t("EditDoctorSuccessMsg"))
-          
+          setDoctorInfo(data)
+          setDoctorDetails(data)
         },
         onError: () => {
 
@@ -45,7 +46,7 @@ export default function Profile() {
   return (
     <div className="mx-25 my-10 flex">
       {mutation.isPending && <FullPageSpinner />}
-      <div className="p-4 border-black border-2 w-1/4 h-1/8 flex mx-2">
+      <div className="p-4 border-gray-300 border-2 rounded-md w-1/4 h-1/8 flex mx-2">
         <Avatar className="h-14 w-14">
           <AvatarFallback className="text-black">{initials}</AvatarFallback>
         </Avatar>
@@ -54,7 +55,7 @@ export default function Profile() {
           <p>{`${doctorDetails.firstName} ${doctorDetails.lastName}`}</p>
         </div>
       </div>
-      <div className="border-black border-2 w-3/4 p-4">
+      <div className="border-gray-300 border-2 rounded-md w-3/4 p-4">
         <div className="my-4">
           <h2>{t("PersonalInformation")}</h2>
           <div className="flex my-2">
