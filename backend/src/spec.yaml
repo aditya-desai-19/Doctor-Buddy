@@ -60,7 +60,7 @@ paths:
                   token: 
                     type: string
   
-  /api/doctor/:
+  /api/doctor:
     get:
       summary: Retrieves doctor's information
       security:
@@ -89,10 +89,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: 
-                    type: string
+                $ref: '#/components/schemas/DoctorInfoResponse'
 
     delete:
       summary: Soft deletes doctor
@@ -200,10 +197,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: 
-                    type: string
+                $ref: '#/components/schemas/PatientInfo'
 
     delete:
       summary: Soft deletes patient
@@ -317,10 +311,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: 
-                    type: string
+                $ref: '#/components/schemas/Treatment'
 
     delete:
       summary: Soft deletes treatment
@@ -439,10 +430,8 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message: 
-                    type: string
+                schema:
+                $ref: '#/components/schemas/PaymentInfo'
 
     delete:
       summary: Soft deletes payment
@@ -572,8 +561,6 @@ components:
         - lastName
         - contactNumber
         - email
-        - _count
-        - createdAt
       properties:
         id:
           type: string
@@ -713,7 +700,6 @@ components:
         - amount
         - treatmentName
         - patientName
-        - createdAt
       properties:
         id:
           type: string

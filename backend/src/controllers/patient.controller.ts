@@ -14,6 +14,8 @@ type GetPatientRequest = paths["/api/patient/"]["get"]["parameters"]["query"]
 type PaginatedPatientResponse =
   paths["/api/patient/"]["get"]["responses"]["200"]["content"]["application/json"]
 
+type PatientInfo = paths["/api/patient/{id}"]["put"]["responses"]["200"]["content"]["application/json"]
+
 const getPatient = async (id: string, doctorId: string) => {
   try {
     return await prisma.patient.findUnique({
@@ -107,7 +109,7 @@ export const updatePatientById = async (req: CustomRequest, res: Response) => {
       return res.status(400).json({ error: "Missing required fields" })
     }
 
-    await prisma.patient.update({
+    const response: PatientInfo = await prisma.patient.update({
       where: {
         id,
         doctorId: req.user.doctorId,
@@ -122,11 +124,18 @@ export const updatePatientById = async (req: CustomRequest, res: Response) => {
         contactNumber,
         email,
       },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        contactNumber: true
+      }
     })
 
     return res
       .status(200)
-      .json({ message: "Successfully updated patient information" })
+      .json(response)
   } catch (error) {
     console.error("Error updating patient:", error)
     return res.status(500).json({ error: "Internal server error" })

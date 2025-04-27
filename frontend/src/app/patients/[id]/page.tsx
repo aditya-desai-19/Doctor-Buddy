@@ -68,8 +68,9 @@ export default function PatientEdit() {
       id,
     }
     mutation.mutate(requestBody, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toastSuccess(t("SuccessfullyUpdatedPatientDetails"))
+        form.reset({firstName: data.firstName, lastName: data.lastName, email: data.email || "", contactNumber: data.contactNumber})
       },
       onError: (error) => {
         console.error(error)

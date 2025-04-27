@@ -67,7 +67,7 @@ export const columns: ColumnDef<PatientInfo>[] = [
 
 export default function PatientListView({ data }: Props) {
   const [isSearching, setIsSearching] = useState<boolean>(false)
-  const { patients, setPatients, removePatient, setSelectedPatient } =
+  const { patients, setPatients, removePatient } =
     usePatientStore((state) => state)
 
   const t = useTranslations()

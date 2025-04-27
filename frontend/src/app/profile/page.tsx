@@ -10,11 +10,11 @@ import { DoctorInfoResponse, UpdateDoctorInfoRequest } from "../../../generated"
 import { useMutation } from "@tanstack/react-query"
 import { saveDoctorInfo } from "@/api/action"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import { toastSuccess } from "@/components/Toast"
 
 export default function Profile() {
   const { initials, doctorDetails, setDoctorDetails } = useDoctorStore((state) => state)
   const [doctorInfo, setDoctorInfo] = useState<DoctorInfoResponse>()
-  const [isSaving, setIsSaving] = useState<boolean>(false)
 
   const t = useTranslations()
   const mutation = useMutation({
@@ -22,12 +22,18 @@ export default function Profile() {
   })
 
   const onSave = useCallback(() => {
-    setIsSaving(true)
     if(doctorInfo) {
       setDoctorDetails(doctorInfo)
-      mutation.mutate(doctorInfo as UpdateDoctorInfoRequest)
+      mutation.mutate(doctorInfo as UpdateDoctorInfoRequest, {
+        onSuccess: (data) => {
+          toastSuccess(t("EditDoctorSuccessMsg"))
+          
+        },
+        onError: () => {
+
+        }
+      })
     }
-    setIsSaving(false)
   }, [doctorInfo])
 
   useEffect(() => {
@@ -38,7 +44,7 @@ export default function Profile() {
   //todo improve styling
   return (
     <div className="mx-25 my-10 flex">
-      {isSaving && <FullPageSpinner />}
+      {mutation.isPending && <FullPageSpinner />}
       <div className="p-4 border-black border-2 w-1/4 h-1/8 flex mx-2">
         <Avatar className="h-14 w-14">
           <AvatarFallback className="text-black">{initials}</AvatarFallback>

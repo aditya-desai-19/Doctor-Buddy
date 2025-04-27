@@ -24,7 +24,7 @@ import { toastError, toastSuccess } from "@/components/Toast"
 import { useCallback } from "react"
 import { Payment } from "../../../../generated"
 
-const formSchema = z.object({
+export const formSchema = z.object({
   amount: z.number(),
 })
 

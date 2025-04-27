@@ -152,7 +152,7 @@ export const updateDoctor = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ message: "Doctor not found" })
     }
 
-    await prisma.doctor.update({
+    const response = await prisma.doctor.update({
       where: { id: req.user.doctorId },
       data: {
         firstName,
@@ -161,9 +161,15 @@ export const updateDoctor = async (req: CustomRequest, res: Response) => {
       },
     })
 
+    const formattedResponse: DoctorInfo = {
+      email: response.email,
+      firstName: response.firstName,
+      lastName: response.lastName
+    } 
+
     return res
       .status(200)
-      .json({ message: "Successfully updated doctor information" })
+      .json(formattedResponse)
   } catch (error) {
     console.error(error)
     return res.status(500).json({ message: "Something went wrong" })

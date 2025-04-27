@@ -58,5 +58,7 @@
   "PaymentSuccessMsg": "Successfully created payment",
   "DeleteTreatmentSuccessMsg": "Successfully deleted treatment",
   "DeletePaymentSuccessMsg": "Successfully deleted treatment",
-  "EditPayment": "Edit Payment"
+  "EditPayment": "Edit Payment",
+  "EditPaymentSuccessMsg": "Successfully updated payment",
+  "EditDoctorSuccessMsg": "Successfully updated doctor's details"
 }

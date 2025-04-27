@@ -1,7 +1,13 @@
 "use server"
 
 import { ACCESS_TOKEN_KEY } from "@/common/constants"
-import { CommonRequestQueryParms, PaymentRequest, UpdatePatientWithIdRequest, UpdateTreatmentWithIdRequest } from "@/common/types"
+import {
+  CommonRequestQueryParms,
+  PaymentRequest,
+  UpdatePatientWithIdRequest,
+  UpdatePaymentWithIdRequest,
+  UpdateTreatmentWithIdRequest,
+} from "@/common/types"
 import { cookies } from "next/headers"
 import {
   ApiPatientPost201Response,
@@ -15,6 +21,7 @@ import {
   PaginatedTreatmentResponse,
   PatientInfo,
   Payment,
+  PaymentInfo,
   Summary,
   Treatment,
   TreatmentInfo,
@@ -58,7 +65,7 @@ export const handleLogin = async (
   }
 }
 
-export const handleLogout = async() => {
+export const handleLogout = async () => {
   try {
     const cookieStore = await cookies()
     cookieStore.delete(ACCESS_TOKEN_KEY)
@@ -129,7 +136,7 @@ export const createPatient = async (
 
 export const updatePatient = async (
   data: UpdatePatientWithIdRequest
-): Promise<boolean | null> => {
+): Promise<PatientInfo> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const { firstName, lastName, email, contactNumber, id } = data
@@ -141,7 +148,7 @@ export const updatePatient = async (
     }
     const response = await clientInstance.apiPatientIdPut(id, newData)
     if (response.status === 200) {
-      return true
+      return response.data
     }
     throw new Error("Failed to create patient")
   }
@@ -176,7 +183,11 @@ export const searchPatient = async (
 ): Promise<PaginatedPatientResponse> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
-    const response = await clientInstance.apiPatientGet(undefined, undefined, text)
+    const response = await clientInstance.apiPatientGet(
+      undefined,
+      undefined,
+      text
+    )
     if (response.status === 200) {
       return response.data
     }
@@ -185,8 +196,8 @@ export const searchPatient = async (
 }
 
 //doctor
-export const getDoctorDetails = async (): Promise<DoctorInfoResponse | null> => {
-  try {
+export const getDoctorDetails =
+  async (): Promise<DoctorInfoResponse> => {
     const clientInstance = await getApiClientWithToken()
     if (clientInstance) {
       const response = await clientInstance.apiDoctorGet()
@@ -195,14 +206,10 @@ export const getDoctorDetails = async (): Promise<DoctorInfoResponse | null> => 
       }
     }
     throw new Error("Failed to get api client")
-  } catch (error) {
-    console.error(error)
-    return null
   }
-}
 
 //todo improve spec redundant type UpdateDoctorInfoRequest
-export const saveDoctorInfo = async(values: UpdateDoctorInfoRequest) => {
+export const saveDoctorInfo = async (values: UpdateDoctorInfoRequest) => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiDoctorPut(values)
@@ -236,14 +243,14 @@ export const getTreatmentById = async (id: string): Promise<Treatment> => {
   throw new Error("Failed to get api client")
 }
 
-export const updateTreatment = async (data: UpdateTreatmentWithIdRequest)=> {
+export const updateTreatment = async (data: UpdateTreatmentWithIdRequest) => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const body: UpdateTreatmentRequest = {
       cost: data.cost,
       name: data.name,
       description: data.description,
-      patientId: data.patientId
+      patientId: data.patientId,
     }
     const response = await clientInstance.apiTreatmentIdPut(data.id, body)
     if (response.status === 200) {
@@ -253,10 +260,16 @@ export const updateTreatment = async (data: UpdateTreatmentWithIdRequest)=> {
   throw new Error("Failed to get api client")
 }
 
-export const getTreatments = async (q: CommonRequestQueryParms): Promise<PaginatedTreatmentResponse> => {
+export const getTreatments = async (
+  q: CommonRequestQueryParms
+): Promise<PaginatedTreatmentResponse> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
-    const response = await clientInstance.apiTreatmentGet(q.page, q.limit, q.search)
+    const response = await clientInstance.apiTreatmentGet(
+      q.page,
+      q.limit,
+      q.search
+    )
     if (response.status === 200) {
       return response.data
     }
@@ -288,10 +301,17 @@ export const createPayment = async (data: Payment) => {
 }
 
 //payments
-export const getPayments = async (query: PaymentRequest): Promise<PaginatedPaymentResponse> => {
+export const getPayments = async (
+  query: PaymentRequest
+): Promise<PaginatedPaymentResponse> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
-    const response = await clientInstance.apiPaymentGet(query.page, query.limit, query.treatmentId, query.search)
+    const response = await clientInstance.apiPaymentGet(
+      query.page,
+      query.limit,
+      query.treatmentId,
+      query.search
+    )
     if (response.status === 200) {
       return response.data
     }
@@ -303,6 +323,30 @@ export const deletePayment = async (id: string) => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const response = await clientInstance.apiPaymentIdDelete(id)
+    if (response.status === 200) {
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+export const getPayment = async (id: string): Promise<PaymentInfo> => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPaymentIdGet(id)
+    if (response.status === 200) {
+      return response.data
+    }
+  }
+  throw new Error("Failed to get api client")
+}
+
+export const updatePayment = async (q: UpdatePaymentWithIdRequest) => {
+  const clientInstance = await getApiClientWithToken()
+  if (clientInstance) {
+    const response = await clientInstance.apiPaymentIdPut(q.id, {
+      amount: q.amount,
+    })
     if (response.status === 200) {
       return response.data
     }

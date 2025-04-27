@@ -14,6 +14,8 @@ type PaginatedPaymentResponse =
 
 type Payment = paths["/api/payment/"]["get"]["responses"]["200"]["content"]["application/json"]["data"]
 
+type PaymentInfo = paths["/api/payment/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
+
 export const createPayment = async (req: CustomRequest, res: Response) => {
   try {
     const { amount, treatmentId }: CreatePaymentRequest = req.body
@@ -61,13 +63,35 @@ export const getPaymentById = async (req: CustomRequest, res: Response) => {
           },
         },
       },
+      select: {
+        id: true,
+        amount: true,
+        treatment: {
+          select: {
+            name: true,
+            patient: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        }
+      }
     })
 
     if (!result) {
       return res.status(404).json({ message: "Payment not found" })
     }
 
-    return res.status(200).json({ ...result })
+    const formattedResult: PaymentInfo = {
+      id: result?.id ,
+      amount: result?.amount,
+      treatmentName: result.treatment.name,
+      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`
+    }
+
+    return res.status(200).json({ ...formattedResult })
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: "Failed to retrieve payments" })
@@ -79,7 +103,7 @@ export const updatePayment = async (req: CustomRequest, res: Response) => {
     const id = req.params.id
     const { amount } = req.body
 
-    await prisma.payment.update({
+    const result = await prisma.payment.update({
       where: {
         id,
         isDeleted: false,
@@ -94,11 +118,33 @@ export const updatePayment = async (req: CustomRequest, res: Response) => {
         },
       },
       data: { amount },
+      select: {
+        id: true,
+        amount: true,
+        treatment: {
+          select: {
+            name: true,
+            patient: {
+              select: {
+                firstName: true,
+                lastName: true
+              }
+            }
+          }
+        }
+      }
     })
+
+    const formattedResult: PaymentInfo = {
+      id: result?.id ,
+      amount: result?.amount,
+      treatmentName: result.treatment.name,
+      patientName: `${result.treatment.patient.firstName} ${result.treatment.patient.lastName}`
+    }
 
     return res
       .status(200)
-      .json({ message: "Successfully updated payment information" })
+      .json(formattedResult)
   } catch (error) {
     console.error(error)
     return res.status(500).json({ error: "Failed to update payment" })
