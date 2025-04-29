@@ -38,7 +38,7 @@ export default function Header({ isCookieExist }: Props) {
     e.stopPropagation()
     setIsLoggedIn(false)
     logout()
-    router.push("/")
+    router.push("/login")
   }, [])
 
   useEffect(() => {
@@ -61,25 +61,25 @@ export default function Header({ isCookieExist }: Props) {
   }, [isCookieExist])
 
   return (
-    <nav className="w-full px-6 py-4 shadow-md">
-      <div className="flex justify-between items-center mx-20">
+    <nav className="w-full px-6 py-4 shadow-md max-md:px-1 max-md:py-2">
+      <div className={`flex justify-between items-center mx-20 max-md:mx-6 ${isLoggedIn ? "max-md:flex-col" : ""}`}>
         <div>
-          <Link href="/" className="text-2xl font-semibold text-blue-900">
+          <Link href="/" className="text-2xl max-md:text-sm font-semibold text-blue-900">
             {t("DoctorBuddy")}
           </Link>
         </div>
         {isLoggedIn ? (
-          <div className="flex items-center">
-            <Link href={"/patients"} className="mx-8">
+          <div className="flex items-center max-md:text-xs">
+            <Link href={"/patients"} className="mx-8 max-md:mx-2">
               {t("Patients")}
             </Link>
-            <Link href={"/treatments"} className="mx-8">
+            <Link href={"/treatments"} className="mx-8 max-md:mx-2">
               {t("Treatments")}
             </Link>
-            <Link href={"/payments"} className="mx-8">
+            <Link href={"/payments"} className="mx-8 max-md:mx-2">
               {t("Payments")}
             </Link>
-            <Link href="/profile" className="hover:underline mx-8">
+            <Link href="/profile" className="hover:underline mx-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Avatar>
@@ -108,7 +108,7 @@ export default function Header({ isCookieExist }: Props) {
           </div>
         ) : (
           <Button
-            className="bg-white border-2 border-gray-200 text-gray-500 hover:text-blue-500 hover:border-blue-400 hover:bg-white cursor-pointer"
+            className="bg-white border-2 border-gray-200 text-sm text-gray-500 hover:text-blue-500 hover:border-blue-400 hover:bg-white cursor-pointer max-md:w-30 max-md:text-xs"
             onClick={() => router.push("/login")}
           >{`${t("Login")} / ${t("SignUp")}`}</Button>
         )}
