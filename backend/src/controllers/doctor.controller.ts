@@ -27,7 +27,7 @@ type DoctorResponse = {
 } | null
 
 type DoctorInfo =
-  paths["/api/doctor/{id}"]["get"]["responses"]["200"]["content"]["application/json"]
+  paths["/api/doctor"]["get"]["responses"]["200"]["content"]["application/json"]
 
 const checkIfUserExist = async (email: string): Promise<DoctorResponse> => {
   try {
