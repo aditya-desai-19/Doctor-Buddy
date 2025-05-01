@@ -20,7 +20,7 @@ import { useMutation } from "@tanstack/react-query"
 import { createTreatment } from "@/api/action"
 import { toastError, toastSuccess } from "@/components/Toast"
 import { useRouter } from "next/navigation"
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 
 export const formSchema = z.object({
@@ -76,7 +76,7 @@ export default function CreateTreatmentPage() {
   }, [])
 
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {mutation.isPending && <FullPageSpinner />}
       <h2 className="my-6 text-xl text-blue-900">{t("CreateTreatment")}</h2>
       <Form {...form}>

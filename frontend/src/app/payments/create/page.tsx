@@ -74,7 +74,7 @@ export default function PaymentCreatePage() {
   }, [treatmentId])
 
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {(isPending || mutation.isPending) && <FullPageSpinner />}
       <SubHeading title={t("CreatePayment")} />
       <div className="space-y-6 max-w-md mx-auto mt-10 mb-4 text-[var(--font-color)]">

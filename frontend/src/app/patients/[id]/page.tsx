@@ -48,6 +48,8 @@ export default function PatientEdit() {
     resolver: zodResolver(formSchema),
   })
 
+  const email = form.watch("email")
+
   const mutation = useMutation({
     mutationFn: updatePatient,
   })
@@ -62,26 +64,44 @@ export default function PatientEdit() {
   }
 
   const onSave = useCallback(() => {
-    const data = form.getValues()
-    const requestBody: UpdatePatientWithIdRequest = {
-      ...data,
-      id,
+    try {
+      const data = form.getValues()
+      formSchema.parse(data)
+      const requestBody: UpdatePatientWithIdRequest = {
+        ...data,
+        id,
+      }
+      mutation.mutate(requestBody, {
+        onSuccess: (data) => {
+          toastSuccess(t("SuccessfullyUpdatedPatientDetails"))
+          console.log({ data })
+          form.reset({
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email || "",
+            contactNumber: data.contactNumber,
+          })
+        },
+        onError: (error) => {
+          console.error(error)
+          toastError(t("SomeErrorOccured"))
+        },
+      })
+    } catch (error) {
+      toastError(t("SomeErrorOccured"))
     }
-    mutation.mutate(requestBody, {
-      onSuccess: (data) => {
-        toastSuccess(t("SuccessfullyUpdatedPatientDetails"))
-        form.reset({firstName: data.firstName, lastName: data.lastName, email: data.email || "", contactNumber: data.contactNumber})
-      },
-      onError: (error) => {
-        console.error(error)
-        toastError(t("SomeErrorOccured"))
-      },
-    })
   }, [form, pathname])
 
   const navigateToList = useCallback(() => {
     router.push("/patients")
   }, [])
+
+  const checkDisabilityOfButton = useCallback(() => {
+    if(!data?.email) {
+      return email === ""
+    }
+    return !form.formState.isDirty
+  }, [data, email, form])
 
   useEffect(() => {
     if (data) {
@@ -97,7 +117,7 @@ export default function PatientEdit() {
   }, [data])
 
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {(mutation.isPending || isPending) && <FullPageSpinner />}
       <SubHeading title={t("EditPatient")} />
       <Accordion
@@ -110,71 +130,71 @@ export default function PatientEdit() {
           <AccordionContent>
             <Form {...form}>
               <form className="space-y-6 text-[var(--font-color)]">
-              <div className="flex mx-2">
-                <FormField
-                  control={form.control}
-                  name={"firstName"}
-                  render={({ field }) => {
-                    return (
+                <div className="flex mx-2">
+                  <FormField
+                    control={form.control}
+                    name={"firstName"}
+                    render={({ field }) => {
+                      return (
+                        <FormItem className="w-full m-2">
+                          <FormLabel>{t("FirstName")}</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder={"John"}
+                              {...field}
+                              type={"text"}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )
+                    }}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={"lastName"}
+                    render={({ field }) => (
                       <FormItem className="w-full m-2">
-                        <FormLabel>{t("FirstName")}</FormLabel>
+                        <FormLabel>{t("LastName")}</FormLabel>
+                        <FormControl>
+                          <Input placeholder={"Doe"} {...field} type={"text"} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex mx-2">
+                  <FormField
+                    control={form.control}
+                    name={"email"}
+                    render={({ field }) => (
+                      <FormItem className="w-full m-2">
+                        <FormLabel>{t("Email")}</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder={"John"}
+                            placeholder={"john@gmail.com"}
                             {...field}
                             type={"text"}
                           />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
-                    )
-                  }}
-                />
-                <FormField
-                  control={form.control}
-                  name={"lastName"}
-                  render={({ field }) => (
-                    <FormItem className="w-full m-2">
-                      <FormLabel>{t("LastName")}</FormLabel>
-                      <FormControl>
-                        <Input placeholder={"Doe"} {...field} type={"text"} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                </div>
-                <div className="flex mx-2">
-                <FormField
-                  control={form.control}
-                  name={"email"}
-                  render={({ field }) => (
-                    <FormItem className="w-full m-2">
-                      <FormLabel>{t("Email")}</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder={"john@gmail.com"}
-                          {...field}
-                          type={"text"}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={"contactNumber"}
-                  render={({ field }) => (
-                    <FormItem className="w-full m-2">
-                      <FormLabel>{t("ContactNumber")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} type={"text"} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={"contactNumber"}
+                    render={({ field }) => (
+                      <FormItem className="w-full m-2">
+                        <FormLabel>{t("ContactNumber")}</FormLabel>
+                        <FormControl>
+                          <Input {...field} type={"text"} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
               </form>
             </Form>
@@ -185,7 +205,7 @@ export default function PatientEdit() {
         <Button
           className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
           onClick={onSave}
-          disabled={!form.formState.isDirty}
+          disabled={checkDisabilityOfButton()}
         >
           {t("Save")}
         </Button>

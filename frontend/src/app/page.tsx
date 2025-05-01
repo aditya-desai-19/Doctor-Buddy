@@ -20,13 +20,13 @@ const Tile = ({
   return (
     <Card className="rounded-2xl m-4 shadow-md w-sm">
       <CardHeader>
-        <CardTitle className="text-lg text-gray-700">{title}</CardTitle>
+        <CardTitle className="text-lg text-gray-700 max-sm:text-sm sm:max-lg:text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <Skeleton className="h-10 w-" />
         ) : (
-          <p className="text-3xl font-bold text-blue-600">{number}</p>
+          <p className="text-2xl font-bold text-blue-600 max-lg:text-lg">{number}</p>
         )}
       </CardContent>
     </Card>

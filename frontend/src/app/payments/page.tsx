@@ -9,11 +9,11 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { debounce } from "lodash"
-import { Input } from "@/components/ui/input"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { deletePayment, getPayments } from "@/api/action"
 import { toastError, toastSuccess } from "@/components/Toast"
+import SearchInput from "@/components/SearchInput"
 
 export const columns: ColumnDef<PaymentInfo>[] = [
   {
@@ -56,9 +56,10 @@ type Props = {
   treatmentId?: string
   showSearch?: boolean
   onCreate?: () => void
+  className?: string
 }
 
-export default function PaymentListView({treatmentId, showSearch=true, onCreate=undefined}: Props) {
+export default function PaymentListView({treatmentId, showSearch=true, onCreate=undefined, className="h-9/10 p-10"}: Props) {
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const [payments, setPayments] = useState<PaymentInfo[]>([])
 
@@ -116,14 +117,10 @@ export default function PaymentListView({treatmentId, showSearch=true, onCreate=
   }, [data?.data])
 
   return (
-    <div className="h-9/10 p-10">
+    <div className={className}>
       <div>
         {(isSearching || isPending) && <FullPageSpinner />}
-        {showSearch && <Input
-          placeholder="Search..."
-          className="w-1/4 my-2"
-          onChange={onSearchTextChange}
-        />}
+        {showSearch && <SearchInput onChange={onSearchTextChange}/>}
         <DataTable
           data={payments}
           columns={columns}

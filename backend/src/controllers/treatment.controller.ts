@@ -146,7 +146,7 @@ export const updateTreatment = async (req: CustomRequest, res: Response) => {
       return res.status(404).json({ error: "Treatment not found" })
     }
 
-    await prisma.treatment.update({
+    const updatedTreatment =  await prisma.treatment.update({
       where: {
         id,
         isDeleted: false,
@@ -163,9 +163,31 @@ export const updateTreatment = async (req: CustomRequest, res: Response) => {
         description,
         patientId,
       },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        cost: true,
+        patientId: true,
+        patient: {
+          select: {
+            firstName: true,
+            lastName: true
+          }
+        }
+      }
     })
 
-    res.status(200).json({ message: "Treatment updated successfully" })
+    const formattedResponse: TreatmentResponse = {
+      id: updatedTreatment.id,
+      name: updatedTreatment.name,
+      description: updatedTreatment.description || undefined,
+      cost: updatedTreatment.cost,
+      patientId: updatedTreatment.patientId,
+      patientName: `${updatedTreatment.patient.firstName} ${updatedTreatment.patient.lastName}`,
+    }
+
+    res.status(200).json(formattedResponse)
   } catch (err) {
     console.error("Error updating treatment:", err)
     res.status(500).json({ error: "Internal server error" })

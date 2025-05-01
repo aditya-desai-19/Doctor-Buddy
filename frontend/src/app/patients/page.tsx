@@ -13,8 +13,8 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { debounce } from "lodash"
-import { Input } from "@/components/ui/input"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import SearchInput from "@/components/SearchInput"
 
 export const columns: ColumnDef<PatientInfo>[] = [
   {
@@ -124,11 +124,7 @@ export default function PatientListView() {
     <div className="h-9/10 p-10">
       <div>
         {(isSearching || isPending) && <FullPageSpinner />}
-        <Input
-          placeholder="Search..."
-          className="w-1/4 my-2"
-          onChange={onSearchTextChange}
-        />
+        <SearchInput onChange={onSearchTextChange}/>
         <DataTable
           data={patients}
           columns={columns}

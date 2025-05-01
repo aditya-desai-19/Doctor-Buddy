@@ -43,6 +43,8 @@ export default function EditTreatmentPage() {
     resolver: zodResolver(formSchema),
   })
 
+  const description = form.watch("description")
+
   const mutation = useMutation({
     mutationFn: updateTreatment,
   })
@@ -65,8 +67,14 @@ export default function EditTreatmentPage() {
       cost: data.cost
     }
     mutation.mutate(requestBody, {
-      onSuccess: () => {
+      onSuccess: (data) => {
         toastSuccess(t("SuccessfullyUpdatedPatientDetails"))
+        form.reset({
+          cost: data.cost,
+          description: data.description,
+          patientId: data.patientId,
+          treatmentName: data.name
+        })
       },
       onError: (error) => {
         console.error(error)
@@ -88,6 +96,13 @@ export default function EditTreatmentPage() {
     router.push("/payments/create")
   }, [id])
 
+  const checkDisabilityOfButton = useCallback(() => {
+    if(!data?.description) {
+      return description === "" || description === undefined
+    }
+    return !form.formState.isDirty
+  }, [data, description, form])
+
   useEffect(() => {
     if (data) {
       const { patientId, name, cost, description } = data
@@ -101,7 +116,7 @@ export default function EditTreatmentPage() {
   }, [data])
 
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {(mutation.isPending || isPending) && <FullPageSpinner />}
       <SubHeading title={t("EditTreatment")}/>
       <Accordion
@@ -199,7 +214,7 @@ export default function EditTreatmentPage() {
         <AccordionItem value="item-1">
           <AccordionTrigger>{t("PaymentDetails")}</AccordionTrigger>
           <AccordionContent>
-            <PaymentListView treatmentId={id} showSearch={false} onCreate={onCreate}/>
+            <PaymentListView treatmentId={id} showSearch={false} onCreate={onCreate} className="my-4"/>
           </AccordionContent>
         </AccordionItem>
       </Accordion>
@@ -207,7 +222,7 @@ export default function EditTreatmentPage() {
         <Button
           className="my-6 mx-2 bg-blue-500 hover:bg-blue-600"
           onClick={onSave}
-          disabled={!form.formState.isDirty}
+          disabled={checkDisabilityOfButton()}
         >
           {t("Save")}
         </Button>

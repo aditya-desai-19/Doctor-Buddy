@@ -64,12 +64,12 @@ export default function Header({ isCookieExist }: Props) {
     <nav className="w-full px-6 py-4 shadow-md max-md:px-1 max-md:py-2">
       <div className={`flex justify-between items-center mx-20 max-md:mx-6 ${isLoggedIn ? "max-md:flex-col" : ""}`}>
         <div>
-          <Link href="/" className="text-2xl max-md:text-sm font-semibold text-blue-900">
+          <Link href="/" className="text-2xl max-sm:text-sm sm:max-lg:text-lg font-semibold text-blue-900">
             {t("DoctorBuddy")}
           </Link>
         </div>
         {isLoggedIn ? (
-          <div className="flex items-center max-md:text-xs">
+          <div className="flex items-center max-sm:text-sm">
             <Link href={"/patients"} className="mx-8 max-md:mx-2">
               {t("Patients")}
             </Link>

@@ -58,7 +58,7 @@ export default function PatientCreate() {
   }, [])
 
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {mutation.isPending && <FullPageSpinner />}
       <SubHeading title={t("CreatePatient")}/>
       <Form {...form}>
@@ -74,7 +74,7 @@ export default function PatientCreate() {
                 <FormItem>
                   <FormLabel>{t("FirstName")}</FormLabel>
                   <FormControl>
-                    <Input placeholder={"John"} {...field} type={"text"} />
+                    <Input placeholder={"John"} {...field} type={"text"}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

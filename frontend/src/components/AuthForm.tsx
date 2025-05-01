@@ -166,8 +166,8 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
   return (
     <>
       {isLoading && <FullPageSpinner />}
-      <div className="flex items-center justify-center h-[calc(100%-64px)] ">
-        <div className="space-y-8 w-lg border-2 p-2 shadow-md rounded-xl">
+      <div className="flex items-center justify-center h-[calc(100%-70px)] ">
+        <div className="space-y-8 w-lg border-2 p-2 shadow-md rounded-xl max-sm:w-4/5">
           <h2
             className="text-center text-xl font-semibold"
             style={{ color: "var(--font-color)" }}

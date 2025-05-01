@@ -41,12 +41,10 @@ export default function Profile() {
     setDoctorInfo(doctorDetails)
   }, [doctorDetails])
 
-
-  //todo improve styling
   return (
-    <div className="mx-25 my-10 flex">
+    <div className="mx-25 my-10 flex max-lg:flex-col max-sm:mx-10">
       {mutation.isPending && <FullPageSpinner />}
-      <div className="p-4 border-gray-300 border-2 rounded-md w-1/4 h-1/8 flex mx-2">
+      <div className="p-4 border-gray-300 border-2 rounded-md w-1/4 h-1/8 flex mx-2 max-lg:w-full max-lg:my-4 max-lg:mx-0">
         <Avatar className="h-14 w-14">
           <AvatarFallback className="text-black">{initials}</AvatarFallback>
         </Avatar>
@@ -55,7 +53,7 @@ export default function Profile() {
           <p>{`${doctorDetails.firstName} ${doctorDetails.lastName}`}</p>
         </div>
       </div>
-      <div className="border-gray-300 border-2 rounded-md w-3/4 p-4">
+      <div className="border-gray-300 border-2 rounded-md w-3/4 p-4 max-lg:w-full">
         <div className="my-4">
           <h2>{t("PersonalInformation")}</h2>
           <div className="flex my-2">

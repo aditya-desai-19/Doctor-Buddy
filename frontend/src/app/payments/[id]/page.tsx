@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { usePathname } from "next/navigation"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { getPayment, getTreatmentById, updatePayment } from "@/api/action"
+import { getPayment, updatePayment } from "@/api/action"
 import { toastError, toastSuccess } from "@/components/Toast"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { useCallback, useEffect } from "react"
@@ -70,7 +70,7 @@ export default function PaymentEditPage() {
   }, [data])
   
   return (
-    <div className="mx-30 my-10">
+    <div className="mx-30 my-10 max-sm:mx-6">
       {isPending && <FullPageSpinner />}
       <SubHeading title={t("EditPayment")} />
       <div className="space-y-6 max-w-md mx-auto mt-10 mb-4 text-[var(--font-color)]">

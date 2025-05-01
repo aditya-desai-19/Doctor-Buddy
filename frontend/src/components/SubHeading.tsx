@@ -6,6 +6,6 @@ type Props = {
 
 export default function SubHeading({title}: Props) {
   return (
-    <h2 className="my-6 text-xl text-blue-900">{title}</h2>
+    <h2 className="my-6 text-xl text-blue-900 max-sm:text-lg">{title}</h2>
   )
 }

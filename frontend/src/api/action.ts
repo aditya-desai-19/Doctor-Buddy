@@ -242,7 +242,7 @@ export const getTreatmentById = async (id: string): Promise<Treatment> => {
   throw new Error("Failed to get api client")
 }
 
-export const updateTreatment = async (data: UpdateTreatmentWithIdRequest) => {
+export const updateTreatment = async (data: UpdateTreatmentWithIdRequest): Promise<Treatment> => {
   const clientInstance = await getApiClientWithToken()
   if (clientInstance) {
     const body: UpdateTreatmentRequest = {
