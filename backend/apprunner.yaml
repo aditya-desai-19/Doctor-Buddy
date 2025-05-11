@@ -2,16 +2,17 @@ version: 1.0
 runtime: nodejs18
 
 build:
-  commands: |
-    npm install
-    npm run gen
-    npx prisma generate
-    npx prisma migrate dev --name init
-    npm run build
+  env:
+      - name: DB_URL
+        value: "postgresql://postgres:mypassword@database-2.c5g4oyyko79p.ap-south-1.rds.amazonaws.com:5432/doctorBuddy"
+
+  commands: 
+    - npm install
+    - npm run gen
+    - npx prisma generate
+    - npx prisma migrate dev --name init
+    - npm run build
 
 start:
   command: npm start
 
-environment:
-  variables:
-    DB_URL: "postgresql://postgres:mypassword@database-2.c5g4oyyko79p.ap-south-1.rds.amazonaws.com:5432/doctorBuddy"
