@@ -8,10 +8,8 @@ build:
       - npm run gen
       - npx prisma generate
       - npx prisma migrate dev --name init
-
     build:
       - npm run build
-  
   env:
     - name: DB_URL
       value: "postgresql://postgres:mypassword@database-2.c5g4oyyko79p.ap-south-1.rds.amazonaws.com:5432/doctorBuddy"
