@@ -3,11 +3,13 @@ runtime: nodejs18
 
 build:
   commands:
-    build:
+    pre-build:
       - npm install
       - npm run gen
       - npx prisma generate
       - npx prisma migrate dev --name init
+
+    build:
       - npm run build
   
   env:
