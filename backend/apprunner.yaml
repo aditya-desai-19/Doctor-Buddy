@@ -11,3 +11,7 @@ build:
 
 start:
   command: npm start
+
+environment:
+  variables:
+    DB_URL: "postgresql://postgres:mypassword@5432:5432/doctorBuddy"
