@@ -2,12 +2,12 @@ version: 1.0
 runtime: nodejs18
 
 build:
-  commands:
-    - npm install
-    - npm run gen
-    - npx prisma generate
-    - npx prisma migrate dev --name init
-    - npm run build
+  commands: |
+    npm install
+    npm run gen
+    npx prisma generate
+    npx prisma migrate dev --name init
+    npm run build
 
 start:
   command: npm start
