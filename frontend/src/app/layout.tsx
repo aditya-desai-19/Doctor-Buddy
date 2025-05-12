@@ -8,7 +8,7 @@ import { Open_Sans } from "next/font/google"
 import { cookies } from "next/headers"
 import "./globals.css"
 
-const openSans = Open_Sans()
+const openSans = Open_Sans({subsets: ['latin']})
 
 export default async function RootLayout({
   children,
