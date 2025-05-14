@@ -64,8 +64,8 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
         }
         const response = await handleSignUp(data)
         if (response) {
-          router.push("/login")
           toastSuccess(t("SignUpSuccessMsg"))
+          router.push("/login")
         } else {
           toastError(t("SomeErrorOccured"))
         }
@@ -76,9 +76,9 @@ export default function AuthForm({ formSchema, isSignUp }: Props) {
         }
         const response = await handleLogin(data)
         if (response) {
-          router.push("/")
           toastSuccess(t("LoginSuccessMsg"))
           setIsLoggedIn(true)
+          router.push("/")
         } else {
           toastError(t("SomeErrorOccured"))
         }
