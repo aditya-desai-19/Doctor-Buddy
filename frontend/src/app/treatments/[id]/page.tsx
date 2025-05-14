@@ -30,7 +30,7 @@ import { useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { UpdateTreatmentWithIdRequest } from "@/common/types"
 import { usePaymentStore } from "@/zustand/usePaymentStore"
-import PaymentListView from "@/components/PatientListView"
+import PaymentListView from "@/components/PaymentListView"
 
 export default function EditTreatmentPage() {
   const t = useTranslations()

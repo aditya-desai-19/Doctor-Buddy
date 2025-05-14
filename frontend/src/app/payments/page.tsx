@@ -1,7 +1,7 @@
 "use client"
 
-import PatientListView from "../patients/page"
+import PaymentListView from "@/components/PaymentListView"
 
 export default function Page() {
-  return <PatientListView />
+  return <PaymentListView />
 }

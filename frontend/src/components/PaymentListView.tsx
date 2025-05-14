@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { PaymentInfo } from "../../generated"
 import { useTranslations } from "next-intl"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { deletePayment, getPayments } from "@/api/action"
 import { toastError, toastSuccess } from "./Toast"
