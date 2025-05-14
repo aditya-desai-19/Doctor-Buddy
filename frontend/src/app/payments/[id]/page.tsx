@@ -20,9 +20,9 @@ import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { useCallback, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { formSchema } from "../create/page"
 import { z } from "zod"
 import { UpdatePaymentWithIdRequest } from "@/common/types"
+import { formSchema } from "../constants"
 
 export default function PaymentEditPage() {
   const t = useTranslations()

@@ -23,10 +23,9 @@ import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { toastError, toastSuccess } from "@/components/Toast"
 import { useCallback } from "react"
 import { Payment } from "../../../../generated"
+import { formSchema } from "../constants"
 
-export const formSchema = z.object({
-  amount: z.number(),
-})
+
 
 export default function PaymentCreatePage() {
   const treatmentId = usePaymentStore((state) => state.treatmentId)

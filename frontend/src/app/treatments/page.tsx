@@ -16,7 +16,7 @@ import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { CommonRequestQueryParms } from "@/common/types"
 import SearchInput from "@/components/SearchInput"
 
-export const columns: ColumnDef<TreatmentInfo>[] = [
+const columns: ColumnDef<TreatmentInfo>[] = [
   {
     id: "select",
     header: "",

@@ -16,7 +16,7 @@ import { debounce } from "lodash"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import SearchInput from "@/components/SearchInput"
 
-export const columns: ColumnDef<PatientInfo>[] = [
+const columns: ColumnDef<PatientInfo>[] = [
   {
     id: "select",
     header: "",

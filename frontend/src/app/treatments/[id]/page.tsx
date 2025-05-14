@@ -9,7 +9,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useTranslations } from "next-intl"
 import { useForm } from "react-hook-form"
-import { FormData, formSchema } from "../create/page"
+import { FormData, formSchema } from "../constants"
 import {
   Form,
   FormControl,
@@ -30,7 +30,7 @@ import { useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { UpdateTreatmentWithIdRequest } from "@/common/types"
 import { usePaymentStore } from "@/zustand/usePaymentStore"
-import PaymentListView from "@/app/payments/page"
+import PaymentListView from "@/components/PatientListView"
 
 export default function EditTreatmentPage() {
   const t = useTranslations()
