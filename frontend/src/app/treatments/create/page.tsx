@@ -23,8 +23,9 @@ import { useRouter } from "next/navigation"
 import { useCallback } from "react"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { formSchema, FormData } from "../constants"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
-export default function CreateTreatmentPage() {
+const CreateTreatmentPage = () => {
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
   })
@@ -162,3 +163,5 @@ export default function CreateTreatmentPage() {
     </div>
   )
 }
+
+export default withProtectedRoute(CreateTreatmentPage)

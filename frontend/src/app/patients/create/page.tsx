@@ -22,6 +22,7 @@ import { z } from "zod"
 import { CreatePatientRequest } from "../../../../generated"
 import SubHeading from "@/components/SubHeading"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
 const formSchema = z.object({
   firstName: z.string(),
@@ -32,7 +33,7 @@ const formSchema = z.object({
     .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
 })
 
-export default function PatientCreate() {
+const PatientCreate = () => {
   const t = useTranslations()
   const router = useRouter()
 
@@ -132,3 +133,5 @@ export default function PatientCreate() {
     </div>
   )
 }
+
+export default withProtectedRoute(PatientCreate)

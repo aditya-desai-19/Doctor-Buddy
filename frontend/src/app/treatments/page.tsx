@@ -15,6 +15,7 @@ import { debounce } from "lodash"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { CommonRequestQueryParms } from "@/common/types"
 import SearchInput from "@/components/SearchInput"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
 const columns: ColumnDef<TreatmentInfo>[] = [
   {
@@ -65,7 +66,7 @@ const columns: ColumnDef<TreatmentInfo>[] = [
   },
 ]
 
-export default function TreatmentListView() {
+const TreatmentListView = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const [treatments, setTreatments] = useState<TreatmentInfo[]>([])
   const t = useTranslations()
@@ -144,3 +145,5 @@ export default function TreatmentListView() {
     </div>
   )
 }
+
+export default withProtectedRoute(TreatmentListView)

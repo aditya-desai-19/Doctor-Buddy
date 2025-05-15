@@ -1,7 +1,10 @@
 "use client"
 
 import PaymentListView from "@/components/PaymentListView"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
-export default function Page() {
+const PaymentListViewPage = () => {
   return <PaymentListView />
 }
+
+export default withProtectedRoute(PaymentListViewPage)
