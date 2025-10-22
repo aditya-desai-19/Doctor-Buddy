@@ -4,8 +4,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "gen": "openapi-typescript ./src/spec.yaml -o ./_openapi_generated/schema.d.ts",
-    "prettier": "prettier **/*.ts --write",
-    "postinstall": "prisma generate"
+    "prettier": "prettier **/*.ts --write"
   },
   "dependencies": {
     "@prisma/client": "^6.5.0",

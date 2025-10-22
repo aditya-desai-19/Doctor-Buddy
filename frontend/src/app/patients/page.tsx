@@ -15,6 +15,7 @@ import { format } from "date-fns"
 import { debounce } from "lodash"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import SearchInput from "@/components/SearchInput"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
 const columns: ColumnDef<PatientInfo>[] = [
   {
@@ -61,7 +62,7 @@ const columns: ColumnDef<PatientInfo>[] = [
   },
 ]
 
-export default function PatientListView() {
+const PatientListView = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false)
   const { patients, setPatients, removePatient } = usePatientStore(
     (state) => state
@@ -136,3 +137,5 @@ export default function PatientListView() {
     </div>
   )
 }
+
+export default withProtectedRoute(PatientListView)

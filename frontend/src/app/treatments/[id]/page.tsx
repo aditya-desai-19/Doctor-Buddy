@@ -31,8 +31,9 @@ import { Button } from "@/components/ui/button"
 import { UpdateTreatmentWithIdRequest } from "@/common/types"
 import { usePaymentStore } from "@/zustand/usePaymentStore"
 import PaymentListView from "@/components/PaymentListView"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
-export default function EditTreatmentPage() {
+const EditTreatmentPage = () => {
   const t = useTranslations()
   const pathname = usePathname()
   const id = pathname.substring(pathname.indexOf("s/") + 2)
@@ -236,3 +237,5 @@ export default function EditTreatmentPage() {
     </div>
   )
 }
+
+export default withProtectedRoute(EditTreatmentPage)

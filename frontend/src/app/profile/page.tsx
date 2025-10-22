@@ -11,8 +11,9 @@ import { useMutation } from "@tanstack/react-query"
 import { saveDoctorInfo } from "@/api/action"
 import { FullPageSpinner } from "@/components/LoadingSpinner"
 import { toastSuccess } from "@/components/Toast"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
-export default function Profile() {
+const Profile = () => {
   const { initials, doctorDetails, setDoctorDetails } = useDoctorStore((state) => state)
   const [doctorInfo, setDoctorInfo] = useState<DoctorInfoResponse>()
 
@@ -98,3 +99,5 @@ export default function Profile() {
     </div>
   )
 }
+
+export default withProtectedRoute(Profile)

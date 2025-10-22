@@ -23,8 +23,9 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
 import { UpdatePaymentWithIdRequest } from "@/common/types"
 import { formSchema } from "../constants"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
-export default function PaymentEditPage() {
+const PaymentEditPage = () => {
   const t = useTranslations()
   const pathname = usePathname()
   const id = pathname.substring(pathname.indexOf("s/") + 2)
@@ -118,3 +119,5 @@ export default function PaymentEditPage() {
     </div>
   )
 }
+
+export default withProtectedRoute(PaymentEditPage)

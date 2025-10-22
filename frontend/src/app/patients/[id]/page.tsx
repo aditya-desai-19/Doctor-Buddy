@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import withProtectedRoute from "@/components/withProtectedRoute"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useTranslations } from "next-intl"
@@ -38,7 +39,7 @@ const formSchema = z.object({
     .regex(/^\d{10}$/, "Phone number must be exactly 10 digits"),
 })
 
-export default function PatientEdit() {
+const PatientEdit = () => {
   const t = useTranslations()
   const router = useRouter()
   const pathname = usePathname()
@@ -219,3 +220,5 @@ export default function PatientEdit() {
     </div>
   )
 }
+
+export default withProtectedRoute(PatientEdit)

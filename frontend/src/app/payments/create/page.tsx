@@ -24,10 +24,11 @@ import { toastError, toastSuccess } from "@/components/Toast"
 import { useCallback } from "react"
 import { Payment } from "../../../../generated"
 import { formSchema } from "../constants"
+import withProtectedRoute from "@/components/withProtectedRoute"
 
 
 
-export default function PaymentCreatePage() {
+const PaymentCreatePage = () => {
   const treatmentId = usePaymentStore((state) => state.treatmentId)
 
   const t = useTranslations()
@@ -120,3 +121,5 @@ export default function PaymentCreatePage() {
     </div>
   )
 }
+
+export default withProtectedRoute(PaymentCreatePage)
