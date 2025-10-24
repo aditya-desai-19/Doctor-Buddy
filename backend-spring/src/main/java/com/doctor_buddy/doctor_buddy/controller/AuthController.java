@@ -1,6 +1,6 @@
 package com.doctor_buddy.doctor_buddy.controller;
 
-import com.doctor_buddy.doctor_buddy.dto.RegisterRequest;
+import com.doctor_buddy.doctor_buddy.entity.User;
 import com.doctor_buddy.doctor_buddy.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/user")
-    ResponseEntity<String> addUser(@Valid @RequestBody RegisterRequest req) {
-        return authService.addUser(req);
+    ResponseEntity<String> addUser(@Valid @RequestBody User user) {
+        return authService.addUser(user);
     }
 }

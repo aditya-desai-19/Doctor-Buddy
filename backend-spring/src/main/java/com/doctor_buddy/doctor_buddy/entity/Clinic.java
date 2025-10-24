@@ -1,34 +1,28 @@
 package com.doctor_buddy.doctor_buddy.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-public class Clinic {
+public class Clinic extends AuditDetails {
 
     @Id
     private String id;
-
-    @NotBlank(message = "clinicId is mandatory")
-    private String clinicId;
 
     @NotBlank(message = "name is mandatory")
     private String name;
 
     private String address;
 
-    private boolean isDeleted;
+    @OneToMany(mappedBy = "clinic", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Staff> staffList = new ArrayList<>();
 
-    @CreationTimestamp
-    private Instant createdAt;
-
-    @UpdateTimestamp
-    private Instant updatedAt;
+    @ManyToOne
+    @JoinColumn(name = "doctor_id")
+    private User user;
 
     public String getId() {
         return id;
@@ -36,14 +30,6 @@ public class Clinic {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public String getClinicId() {
-        return clinicId;
-    }
-
-    public void setClinicId(String clinicId) {
-        this.clinicId = clinicId;
     }
 
     public String getName() {
@@ -62,12 +48,19 @@ public class Clinic {
         this.address = address;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
+    public List<Staff> getStaffList() {
+        return staffList;
     }
 
-    public void setDeleted(boolean deleted) {
-        isDeleted = deleted;
+    public void setStaffList(List<Staff> staffList) {
+        this.staffList = staffList;
     }
 
+    public User getDoctor() {
+        return user;
+    }
+
+    public void setDoctor(User user) {
+        this.user = user;
+    }
 }
